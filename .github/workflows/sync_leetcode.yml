@@ -1,15 +1,22 @@
-name: LeetCode Synchronizer
+name: LeetCode Sync
 
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  sync:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Run LeetCode Synchronizer
-        uses: dos-m0nk3y/LeetCode-Synchronizer@v1.1.0
+      - name: Sync LeetCode submissions
+        uses: joshcai/leetcode-sync@v1.7
         with:
-          GITHUB_TOKEN: ${{ github.token }}
-          LEETCODE_SESSION: ${{ secrets.LEETCODE_SESSION }}
-          LEETCODE_CSRF_TOKEN: ${{ secrets.LEETCODE_CSRF_TOKEN }}
+          github-token: ${{ github.token }}
+          leetcode-csrf-token: ${{ secrets.LEETCODE_CSRF_TOKEN }}
+          leetcode-session: ${{ secrets.LEETCODE_SESSION }}
+          destination-folder: .
+          verbose: true
+          commit-header: "[LeetCode Sync]"
