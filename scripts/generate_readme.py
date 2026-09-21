@@ -246,7 +246,9 @@ def main():
     lines = [
         '<div align="center">',
         "",
-        '  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=28&duration=2800&pause=900&color=58A6FF&center=true&vCenter=true&width=700&lines=LeetCode+Solutions;DSA+%7C+Problem+Solving;One+Problem+at+a+Time+%E2%9C%A8" alt="Typing animation" />',
+        '  <img src="https://capsule-render.vercel.app/api?type=waving&height=180&section=header&text=LeetCode%20Solutions&fontSize=38&fontAlignY=38&desc=DSA%20%7C%20Problem%20Solving%20%7C%20Continuous%20Learning&descAlignY=62&animation=twinkling" alt="Animated LeetCode header" />',
+        "",
+        '  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&duration=2600&pause=800&center=true&vCenter=true&width=720&lines=Solve+%E2%86%92+Understand+%E2%86%92+Improve;One+Problem+at+a+Time;Algorithms+%2B+Data+Structures" alt="Typing animation" />',
         "",
         "  <p><b>A continuously growing collection of accepted LeetCode solutions.</b></p>",
         "",
