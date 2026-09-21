@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import html
 import json
+import os
 import re
 import subprocess
 import urllib.error
@@ -32,9 +33,6 @@ EXTENSIONS = {
     ".sql": "SQL",
     ".sh": "Bash",
     ".dart": "Dart",
-    ".ex": "Elixir",
-    ".erl": "Erlang",
-    ".rkt": "Racket",
 }
 
 EXCLUDED_DIRS = {
@@ -78,13 +76,13 @@ def solution_files():
     return sorted(files, key=lambda p: str(p).lower())
 
 
-def problem_slug(folder_name):
-    return re.sub(r"^\d+-", "", folder_name)
-
-
 def problem_number(folder_name):
     match = re.match(r"^(\d+)-", folder_name)
     return int(match.group(1)) if match else None
+
+
+def problem_slug(folder_name):
+    return re.sub(r"^\d+-", "", folder_name)
 
 
 def clean_problem_title(folder):
@@ -146,22 +144,20 @@ def get_git_performance(folder):
 
 
 def fetch_difficulties(slugs):
-    session = (Path("/dev/null") if False else None)
-    leetcode_session = __import__("os").environ.get("LEETCODE_SESSION", "").strip()
-    csrf_token = __import__("os").environ.get("LEETCODE_CSRF_TOKEN", "").strip()
+    session = os.environ.get("LEETCODE_SESSION", "").strip()
+    csrf_token = os.environ.get("LEETCODE_CSRF_TOKEN", "").strip()
 
-    if not leetcode_session or not csrf_token or not slugs:
+    if not session or not csrf_token or not slugs:
         return {}
 
     results = {}
 
     for start in range(0, len(slugs), 20):
         chunk = slugs[start : start + 20]
-        fields = []
-        for index, slug in enumerate(chunk):
-            fields.append(
-                f"q{index}: question(titleSlug: {json.dumps(slug)}) {{ difficulty }}"
-            )
+        fields = [
+            f"q{index}: question(titleSlug: {json.dumps(slug)}) {{ difficulty }}"
+            for index, slug in enumerate(chunk)
+        ]
 
         payload = json.dumps({
             "query": "query { " + " ".join(fields) + " }"
@@ -176,10 +172,7 @@ def fetch_difficulties(slugs):
                 "Origin": "https://leetcode.com",
                 "Referer": "https://leetcode.com/",
                 "User-Agent": "Mozilla/5.0",
-                "Cookie": (
-                    f"csrftoken={csrf_token}; "
-                    f"LEETCODE_SESSION={leetcode_session};"
-                ),
+                "Cookie": f"csrftoken={csrf_token}; LEETCODE_SESSION={session};",
                 "x-csrftoken": csrf_token,
             },
         )
@@ -192,7 +185,9 @@ def fetch_difficulties(slugs):
             for index, slug in enumerate(chunk):
                 item = data.get(f"q{index}") or {}
                 difficulty = item.get("difficulty")
-                results[slug] = difficulty if difficulty in DIFFICULTY_ORDER else "Unknown"
+                results[slug] = (
+                    difficulty if difficulty in DIFFICULTY_ORDER else "Unknown"
+                )
 
         except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError):
             print("Warning: could not fetch LeetCode difficulty metadata.")
@@ -205,15 +200,13 @@ def fetch_difficulties(slugs):
 def format_metric(value, percentile):
     if value == "—":
         return "—"
-    if percentile:
-        return f"{value} ({percentile})"
-    return value
+    return f"{value} <sub>{percentile}</sub>" if percentile else value
 
 
 def main():
     files = solution_files()
-
     problems = {}
+
     for path in files:
         folder = path.parent
         key = folder.relative_to(ROOT).as_posix()
@@ -251,18 +244,28 @@ def main():
     difficulty_counts = Counter(problem["difficulty"] for problem in problem_list)
 
     lines = [
-        "# LeetCode Solutions",
+        '<div align="center">',
         "",
-        "[![LeetCode](https://img.shields.io/badge/LeetCode-Solutions-orange?logo=leetcode)](https://leetcode.com/)",
-        "[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/Paranthaman-K6/leetcode-solutions)",
+        '  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=28&duration=2800&pause=900&color=58A6FF&center=true&vCenter=true&width=700&lines=LeetCode+Solutions;DSA+%7C+Problem+Solving;One+Problem+at+a+Time+%E2%9C%A8" alt="Typing animation" />',
         "",
-        "> A personal collection of accepted LeetCode solutions, automatically synchronized to GitHub.",
+        "  <p><b>A continuously growing collection of accepted LeetCode solutions.</b></p>",
+        "",
+        f'  <img src="https://img.shields.io/badge/Problems-{problem_count}-0f172a?style=for-the-badge&logo=leetcode&logoColor=orange" alt="Problems" />',
+        f'  <img src="https://img.shields.io/badge/Solutions-{solution_count}-0f172a?style=for-the-badge&logo=github&logoColor=white" alt="Solutions" />',
+        f'  <img src="https://img.shields.io/badge/Languages-{len(language_counts)}-0f172a?style=for-the-badge" alt="Languages" />',
+        "",
+        '  <a href="https://github.com/Paranthaman-K6/leetcode-solutions">Repository</a> · ',
+        '  <a href="https://leetcode.com/">LeetCode</a>',
+        "",
+        "</div>",
+        "",
+        "---",
         "",
         "## Progress",
         "",
-        "| Problems | Solutions | Languages | Easy | Medium | Hard |",
+        "| Problems | Solutions | Easy | Medium | Hard | Languages |",
         "|---:|---:|---:|---:|---:|---:|",
-        f"| {problem_count} | {solution_count} | {len(language_counts)} | {difficulty_counts.get('Easy', 0)} | {difficulty_counts.get('Medium', 0)} | {difficulty_counts.get('Hard', 0)} |",
+        f"| **{problem_count}** | **{solution_count}** | **{difficulty_counts.get('Easy', 0)}** | **{difficulty_counts.get('Medium', 0)}** | **{difficulty_counts.get('Hard', 0)}** | **{len(language_counts)}** |",
         "",
         "### Languages",
         "",
@@ -289,15 +292,18 @@ def main():
         ]
 
         for problem in items:
-            folder = problem["folder"]
             performance = problem["performance"]
+
             for path in sorted(problem["solutions"], key=lambda p: str(p).lower()):
                 language = EXTENSIONS[path.suffix.lower()]
                 relative_solution = quote(
                     path.relative_to(ROOT).as_posix(),
                     safe="/",
                 )
-                number = problem["number"] if problem["number"] is not None else "—"
+
+                number = (
+                    problem["number"] if problem["number"] is not None else "—"
+                )
                 runtime = format_metric(
                     performance["runtime"],
                     performance["runtime_percentile"],
@@ -306,35 +312,28 @@ def main():
                     performance["memory"],
                     performance["memory_percentile"],
                 )
+
                 problem_link = (
                     f"[{problem['title']}]"
                     f"(https://leetcode.com/problems/{quote(problem['slug'])}/)"
                 )
-                solution_link = f"[View]({relative_solution})"
 
                 lines.append(
-                    f"| {number} | {problem_link} | {language} | {runtime} | {memory} | {solution_link} |"
+                    f"| {number} | {problem_link} | {language} | {runtime} | {memory} | [View solution]({relative_solution}) |"
                 )
 
         lines.append("")
 
     lines += [
-        "## Performance",
-        "",
-        "Time and memory values are the metrics reported by LeetCode for the accepted submission.",
-        "When available, the values in parentheses are the corresponding LeetCode percentiles.",
-        "",
-        "This table describes observed execution performance; Big-O time and space complexity are not automatically inferred.",
-        "",
-        "## Automation",
-        "",
-        "New accepted submissions are synchronized using "
-        "[LeetCode Sync](https://github.com/joshcai/leetcode-sync) through GitHub Actions.",
-        "The root README is regenerated automatically after each synchronization run.",
-        "",
         "---",
         "",
-        "Maintained as a learning record of algorithm and data-structure practice.",
+        '<div align="center">',
+        "",
+        '  <img src="https://capsule-render.vercel.app/api?type=waving&height=110&section=footer&text=Keep%20Solving%20%7C%20Keep%20Learning&fontSize=24&fontAlignY=70&animation=twinkling" alt="Animated footer" />',
+        "",
+        "  <sub>Automatically synchronized • Automatically indexed • Built for learning</sub>",
+        "",
+        "</div>",
         "",
     ]
 
