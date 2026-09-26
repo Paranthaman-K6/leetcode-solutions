@@ -3,7 +3,7 @@
 
   <img src="https://readme-typing-svg.demolab.com?font=DejaVu+Sans+Bold&size=17&pause=1200&color=FFFFFF&background=111111&center=true&vCenter=true&width=620&duration=3400&lines=solve%20%E2%86%92%20understand%20%E2%86%92%20improve;one%20problem%20at%20a%20time;algorithms%20%2B%20data%20structures" alt="Typing strip: solve, understand, improve" width="620" />
 
-  <img src="https://img.shields.io/badge/PROBLEMS-19-2D2D2D?style=flat-square&labelColor=111111&logo=leetcode&logoColor=9E9E9E" alt="Problems: 19" /> <img src="https://img.shields.io/badge/SOLUTIONS-20-2D2D2D?style=flat-square&labelColor=111111&logo=github&logoColor=9E9E9E" alt="Solutions: 20" /> <img src="https://img.shields.io/badge/LANGUAGES-2-2D2D2D?style=flat-square&labelColor=111111" alt="Languages: 2" />
+  <img src="https://img.shields.io/badge/PROBLEMS-20-2D2D2D?style=flat-square&labelColor=111111&logo=leetcode&logoColor=9E9E9E" alt="Problems: 20" /> <img src="https://img.shields.io/badge/SOLUTIONS-21-2D2D2D?style=flat-square&labelColor=111111&logo=github&logoColor=9E9E9E" alt="Solutions: 21" /> <img src="https://img.shields.io/badge/LANGUAGES-2-2D2D2D?style=flat-square&labelColor=111111" alt="Languages: 2" />
 
   <a href="https://leetcode.com/u/paranthamank/"><img src="https://leetcard.jacoblin.cool/paranthamank?theme=dark&ext=heatmap" alt="paranthamank's LeetCode stats" /></a>
 
@@ -28,24 +28,24 @@ cd leetcode-solutions
 ## Progress
 
 <div align="center">
-  <img src="https://img.shields.io/badge/EASY%2063%25-12-2D2D2D?style=flat-square&labelColor=111111" alt="Easy: 12" /> <img src="https://img.shields.io/badge/MEDIUM%2032%25-6-2D2D2D?style=flat-square&labelColor=111111" alt="Medium: 6" /> <img src="https://img.shields.io/badge/HARD%205%25-1-2D2D2D?style=flat-square&labelColor=111111" alt="Hard: 1" />
+  <img src="https://img.shields.io/badge/EASY%2065%25-13-2D2D2D?style=flat-square&labelColor=111111" alt="Easy: 13" /> <img src="https://img.shields.io/badge/MEDIUM%2030%25-6-2D2D2D?style=flat-square&labelColor=111111" alt="Medium: 6" /> <img src="https://img.shields.io/badge/HARD%205%25-1-2D2D2D?style=flat-square&labelColor=111111" alt="Hard: 1" />
 </div>
 
 | Problems | Solutions | Easy | Medium | Hard | Languages |
 |---:|---:|---:|---:|---:|---:|
-| **19** | **20** | **12** | **6** | **1** | **2** |
+| **20** | **21** | **13** | **6** | **1** | **2** |
 
 ### Languages
 
 | Language | Solutions |
 |---|---:|
 | C | 19 |
-| Java | 1 |
+| Java | 2 |
 
 ## Solutions
 
 <details>
-<summary><b>Easy</b> — 12 problems</summary>
+<summary><b>Easy</b> — 13 problems</summary>
 
 | # | Problem | Language | Time | Memory | Solution |
 |---:|---|---|---|---|---|
@@ -54,6 +54,7 @@ cd leetcode-solutions
 | 9 | [Palindrome Number](https://leetcode.com/problems/palindrome-number/) | C | 0 ms <sub>100.00%</sub> | 8.8 MB <sub>62.57%</sub> | [View solution](0009-palindrome-number/solution.c) |
 | 20 | [Valid Parentheses](https://leetcode.com/problems/valid-parentheses/) | C | 0 ms <sub>100.00%</sub> | 8.7 MB <sub>67.84%</sub> | [View solution](0020-valid-parentheses/solution.c) |
 | 21 | [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/) | C | 0 ms <sub>100.00%</sub> | 11.6 MB <sub>8.90%</sub> | [View solution](0021-merge-two-sorted-lists/solution.c) |
+| 27 | [Remove Element](https://leetcode.com/problems/remove-element/) | Java | 0 ms <sub>100.00%</sub> | 43.4 MB <sub>61.13%</sub> | [View solution](0027-remove-element/solution.java) |
 | 58 | [Length Of Last Word](https://leetcode.com/problems/length-of-last-word/) | C | 0 ms <sub>100.00%</sub> | 8.9 MB <sub>16.33%</sub> | [View solution](0058-length-of-last-word/solution.c) |
 | 66 | [Plus One](https://leetcode.com/problems/plus-one/) | C | 0 ms <sub>100.00%</sub> | 10 MB <sub>67.92%</sub> | [View solution](0066-plus-one/solution.c) |
 | 125 | [Valid Palindrome](https://leetcode.com/problems/valid-palindrome/) | C | 0 ms <sub>100.00%</sub> | 9.3 MB <sub>21.39%</sub> | [View solution](0125-valid-palindrome/solution.c) |
@@ -100,7 +101,7 @@ leetcode-solutions/
 │   ├── README.md                       # problem statement
 │   ├── solution.c
 │   └── solution.java
-├── …                                   # 18 more problem folders
+├── …                                   # 19 more problem folders
 └── README.md                           # generated index
 ```
 
