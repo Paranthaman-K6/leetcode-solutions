@@ -1,23 +1,35 @@
 <div align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=180&section=header&color=111111&fontColor=FFFFFF&text=LeetCode%20Solutions&fontSize=38&fontAlignY=38&desc=DSA%20%7C%20Problem%20Solving%20%7C%20Continuous%20Learning&descAlignY=62&animation=twinkling" alt="Animated LeetCode header" />
 
-  <img src="https://capsule-render.vercel.app/api?type=waving&height=180&section=header&text=LeetCode%20Solutions&fontSize=38&fontAlignY=38&desc=DSA%20%7C%20Problem%20Solving%20%7C%20Continuous%20Learning&descAlignY=62&animation=twinkling" alt="Animated LeetCode header" />
+  <img src="https://readme-typing-svg.demolab.com?font=DejaVu+Sans+Bold&size=17&pause=1200&color=FFFFFF&background=111111&center=true&vCenter=true&width=620&duration=3400&lines=solve%20%E2%86%92%20understand%20%E2%86%92%20improve;one%20problem%20at%20a%20time;algorithms%20%2B%20data%20structures" alt="Typing strip: solve, understand, improve" width="620" />
 
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&duration=2600&pause=800&center=true&vCenter=true&width=720&lines=Solve+%E2%86%92+Understand+%E2%86%92+Improve;One+Problem+at+a+Time;Algorithms+%2B+Data+Structures" alt="Typing animation" />
+  <img src="https://img.shields.io/badge/PROBLEMS-19-2D2D2D?style=flat-square&labelColor=111111&logo=leetcode&logoColor=9E9E9E" alt="Problems: 19" /> <img src="https://img.shields.io/badge/SOLUTIONS-20-2D2D2D?style=flat-square&labelColor=111111&logo=github&logoColor=9E9E9E" alt="Solutions: 20" /> <img src="https://img.shields.io/badge/LANGUAGES-2-2D2D2D?style=flat-square&labelColor=111111" alt="Languages: 2" />
 
-  <p><b>A continuously growing collection of accepted LeetCode solutions.</b></p>
+  <a href="https://leetcode.com/u/paranthamank/"><img src="https://leetcard.jacoblin.cool/paranthamank?theme=dark&ext=heatmap" alt="paranthamank's LeetCode stats" /></a>
 
-  <img src="https://img.shields.io/badge/Problems-19-0f172a?style=for-the-badge&logo=leetcode&logoColor=orange" alt="Problems" />
-  <img src="https://img.shields.io/badge/Solutions-20-0f172a?style=for-the-badge&logo=github&logoColor=white" alt="Solutions" />
-  <img src="https://img.shields.io/badge/Languages-2-0f172a?style=for-the-badge" alt="Languages" />
-
-  <a href="https://github.com/Paranthaman-K6/leetcode-solutions">Repository</a> · 
-  <a href="https://leetcode.com/">LeetCode</a>
-
+  <a href="https://github.com/Paranthaman-K6/leetcode-solutions">Repository</a> · <a href="https://leetcode.com/u/paranthamank/">LeetCode profile</a>
 </div>
 
 ---
 
+## Overview
+
+> A continuously growing index of accepted LeetCode solutions.
+>
+> Each problem lives in its own folder with the original statement, one file
+> per language, and the runtime and memory figures reported by LeetCode at
+> submission time.
+
+```bash
+git clone https://github.com/Paranthaman-K6/leetcode-solutions.git
+cd leetcode-solutions
+```
+
 ## Progress
+
+<div align="center">
+  <img src="https://img.shields.io/badge/EASY%2063%25-12-2D2D2D?style=flat-square&labelColor=111111" alt="Easy: 12" /> <img src="https://img.shields.io/badge/MEDIUM%2032%25-6-2D2D2D?style=flat-square&labelColor=111111" alt="Medium: 6" /> <img src="https://img.shields.io/badge/HARD%205%25-1-2D2D2D?style=flat-square&labelColor=111111" alt="Hard: 1" />
+</div>
 
 | Problems | Solutions | Easy | Medium | Hard | Languages |
 |---:|---:|---:|---:|---:|---:|
@@ -32,7 +44,8 @@
 
 ## Solutions
 
-### Easy
+<details>
+<summary><b>Easy</b> — 12 problems</summary>
 
 | # | Problem | Language | Time | Memory | Solution |
 |---:|---|---|---|---|---|
@@ -50,7 +63,10 @@
 | 1894 | [Merge Strings Alternately](https://leetcode.com/problems/merge-strings-alternately/) | C | 0 ms <sub>100.00%</sub> | 8.8 MB <sub>40.76%</sub> | [View solution](1894-merge-strings-alternately/solution.c) |
 | 2058 | [Concatenation Of Array](https://leetcode.com/problems/concatenation-of-array/) | C | 0 ms <sub>100.00%</sub> | 15.1 MB <sub>27.39%</sub> | [View solution](2058-concatenation-of-array/solution.c) |
 
-### Medium
+</details>
+
+<details>
+<summary><b>Medium</b> — 6 problems</summary>
 
 | # | Problem | Language | Time | Memory | Solution |
 |---:|---|---|---|---|---|
@@ -61,18 +77,63 @@
 | 61 | [Rotate List](https://leetcode.com/problems/rotate-list/) | C | 0 ms <sub>100.00%</sub> | 11.5 MB <sub>33.45%</sub> | [View solution](0061-rotate-list/solution.c) |
 | 189 | [Rotate Array](https://leetcode.com/problems/rotate-array/) | C | 0 ms <sub>100.00%</sub> | 27.4 MB <sub>76.77%</sub> | [View solution](0189-rotate-array/solution.c) |
 
-### Hard
+</details>
+
+<details>
+<summary><b>Hard</b> — 1 problem</summary>
 
 | # | Problem | Language | Time | Memory | Solution |
 |---:|---|---|---|---|---|
 | 4 | [Median Of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/) | C | 0 ms <sub>100.00%</sub> | 11.9 MB <sub>87.29%</sub> | [View solution](0004-median-of-two-sorted-arrays/solution.c) |
 
+</details>
+
+## Repository layout
+
+```console
+leetcode-solutions/
+├── scripts/
+│   └── generate_readme.py              # builds this README
+├── .github/workflows/
+│   └── sync_leetcode.yml               # sync + regenerate + commit
+├── 0001-two-sum/
+│   ├── README.md                       # problem statement
+│   ├── solution.c
+│   └── solution.java
+├── …                                   # 18 more problem folders
+└── README.md                           # generated index
+```
+
+## How this index is built
+
+`.github/workflows/sync_leetcode.yml` runs on demand and does three things:
+
+1. syncs accepted submissions with `joshcai/leetcode-sync`;
+2. runs `python scripts/generate_readme.py`;
+3. commits the regenerated `README.md`.
+
+So this page is never edited by hand. Notes on the data it reports:
+
+- a folder is indexed only when it holds a `README.md` and at least one
+  solution file, which keeps the index honest as the repository grows;
+- difficulty comes from the LeetCode GraphQL API using the
+  `LEETCODE_SESSION` and `LEETCODE_CSRF_TOKEN` secrets, and falls back to
+  `Unknown` when those are unavailable;
+- the time and memory figures are parsed from the sync commit messages, so
+  a problem shows `—` until it has been submitted at least once.
+
+To rebuild locally:
+
+```bash
+export LEETCODE_SESSION=…
+export LEETCODE_CSRF_TOKEN=…
+python scripts/generate_readme.py
+```
+
 ---
 
 <div align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=110&section=footer&color=111111&fontColor=9E9E9E&text=Keep%20Solving%20%7C%20Keep%20Learning&fontSize=24&fontAlignY=70&animation=twinkling" alt="Animated footer" />
 
-  <img src="https://capsule-render.vercel.app/api?type=waving&height=110&section=footer&text=Keep%20Solving%20%7C%20Keep%20Learning&fontSize=24&fontAlignY=70&animation=twinkling" alt="Animated footer" />
-
-  <sub>Automatically synchronized • Automatically indexed • Built for learning</sub>
-
+  <sub>Automatically synchronized · Automatically indexed · Built for learning</sub>
 </div>
