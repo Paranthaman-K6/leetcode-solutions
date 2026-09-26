@@ -1,0 +1,140 @@
+{
+  "0001-two-sum": {
+    "c": {
+      "approach": "brute force, nested loops",
+      "space": "O(1)",
+      "time": "O(n^2)"
+    },
+    "java": {
+      "approach": "brute force, nested loops",
+      "space": "O(1)",
+      "time": "O(n^2)"
+    }
+  },
+  "0002-add-two-numbers": {
+    "c": {
+      "approach": "iterative digit addition, new list",
+      "space": "O(n)",
+      "time": "O(n)"
+    }
+  },
+  "0003-longest-substring-without-repeating-characters": {
+    "c": {
+      "approach": "sliding start, inner duplicate scan",
+      "space": "O(1)",
+      "time": "O(n^2)"
+    }
+  },
+  "0004-median-of-two-sorted-arrays": {
+    "c": {
+      "approach": "merge sorted arrays, pick middle",
+      "space": "O(m+n)",
+      "time": "O(m+n)"
+    }
+  },
+  "0007-reverse-integer": {
+    "c": {
+      "approach": "extract digits, check overflow",
+      "space": "O(1)",
+      "time": "O(log x)"
+    }
+  },
+  "0009-palindrome-number": {
+    "c": {
+      "approach": "reverse number, compare original",
+      "space": "O(1)",
+      "time": "O(log x)"
+    }
+  },
+  "0019-remove-nth-node-from-end-of-list": {
+    "c": {
+      "approach": "two pass, count then delete",
+      "space": "O(1)",
+      "time": "O(n)"
+    }
+  },
+  "0020-valid-parentheses": {
+    "c": {
+      "approach": "stack, match brackets",
+      "space": "O(n)",
+      "time": "O(n)"
+    }
+  },
+  "0021-merge-two-sorted-lists": {
+    "c": {
+      "approach": "copy nodes into new list",
+      "space": "O(m+n)",
+      "time": "O(m+n)"
+    }
+  },
+  "0058-length-of-last-word": {
+    "c": {
+      "approach": "scan for last word start",
+      "space": "O(1)",
+      "time": "O(n)"
+    }
+  },
+  "0061-rotate-list": {
+    "c": {
+      "approach": "repeatedly move tail to head",
+      "space": "O(1)",
+      "time": "O(k*n)"
+    }
+  },
+  "0066-plus-one": {
+    "c": {
+      "approach": "handle carry, copy array",
+      "space": "O(n)",
+      "time": "O(n)"
+    }
+  },
+  "0125-valid-palindrome": {
+    "c": {
+      "approach": "filter alnum, two pointer compare",
+      "space": "O(n)",
+      "time": "O(n)"
+    }
+  },
+  "0136-single-number": {
+    "c": {
+      "approach": "brute force, nested loops",
+      "space": "O(1)",
+      "time": "O(n^2)"
+    }
+  },
+  "0189-rotate-array": {
+    "c": {
+      "approach": "buffer tail, shift, restore",
+      "space": "O(k)",
+      "time": "O(n)"
+    }
+  },
+  "0485-max-consecutive-ones": {
+    "c": {
+      "approach": "single pass, count streak",
+      "space": "O(1)",
+      "time": "O(n)"
+    }
+  },
+  "1580-shuffle-the-array": {
+    "c": {
+      "approach": "interleave two halves in order",
+      "space": "O(n)",
+      "time": "O(n)"
+    }
+  },
+  "1894-merge-strings-alternately": {
+    "c": {
+      "approach": "alternate chars, append remainder",
+      "space": "O(n+m)",
+      "time": "O(n+m)"
+    }
+  },
+  "2058-concatenation-of-array": {
+    "c": {
+      "approach": "duplicate array via modulo",
+      "space": "O(n)",
+      "time": "O(n)"
+    }
+  }
+}
