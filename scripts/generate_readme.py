@@ -5,11 +5,16 @@ The README is a generated artifact: `.github/workflows/sync_leetcode.yml` runs
 this script after every LeetCode sync and commits the result. Edit this file,
 not README.md, or the changes will be overwritten on the next run.
 
-Visual theme: Carbon (theme-factory), rendered entirely through image APIs
-(no local assets, so there is nothing extra to commit or sync):
+Visual theme: Carbon Terminal, matching the profile repo
+(https://github.com/Paranthaman-K6/Paranthaman-K6), rendered entirely through
+image APIs (no local assets, so there is nothing extra to commit or sync):
   Carbon Black #111111  Graphite #2D2D2D  Ash Gray #9E9E9E  Pure White #FFFFFF
-  capsule-render (header/footer) + readme-typing-svg (strips) + shields.io
-  (badges) + leetcard (LeetCode stats card).
+  gradient capsule-render header/footer + grey readme-typing-svg strips +
+  for-the-badge shields.io chips + dark leetcard.
+
+Per-problem approach notes and Big-O figures are curated in
+`data/problems.json` (the LeetCode API does not provide them and the synced
+solution files carry no annotations). Missing entries render as "—".
 """
 import html
 import json
@@ -40,23 +45,39 @@ LEETCODE_PROFILE_URL = f"{LEETCODE_URL}/u/{LEETCODE_USERNAME}/"
 
 HEADER_IMG = (
     "https://capsule-render.vercel.app/api"
-    "?type=waving&height=180&section=header"
-    f"&color={CARBON_BLACK}&fontColor={PURE_WHITE}"
-    "&text=LeetCode%20Solutions&fontSize=38&fontAlignY=38"
-    "&desc=DSA%20%7C%20Problem%20Solving%20%7C%20Continuous%20Learning&descAlignY=62"
-    "&animation=twinkling"
+    "?type=waving&color=0:2D2D2D,100:111111&height=200&section=header"
+    "&text=LeetCode%20Solutions&fontSize=50&fontColor=FFFFFF"
+    "&animation=fadeIn&fontAlignY=35"
+    "&desc=DSA%20%7C%20Problem%20Solving%20%7C%20Continuous%20Learning"
+    "&descSize=16&descAlignY=55"
 )
 FOOTER_IMG = (
     "https://capsule-render.vercel.app/api"
-    "?type=waving&height=110&section=footer"
-    f"&color={CARBON_BLACK}&fontColor={ASH_GRAY}"
-    "&text=Keep%20Solving%20%7C%20Keep%20Learning&fontSize=24&fontAlignY=70"
-    "&animation=twinkling"
+    "?type=waving&color=0:2D2D2D,100:111111&height=120&section=footer"
 )
 LEETCODE_CARD_IMG = (
     f"https://leetcard.jacoblin.cool/{quote(LEETCODE_USERNAME, safe='')}"
-    "?theme=dark&ext=heatmap"
+    "?theme=dark&font=DejaVu%20Sans&ext=heatmap"
 )
+
+
+def load_complexity():
+    """Curated approach + Big-O data. Tolerates a missing file (renders "—")."""
+    try:
+        return json.loads((ROOT / "data" / "problems.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+COMPLEXITY = load_complexity()
+
+
+def complexity_for(folder_name, ext):
+    entry = (COMPLEXITY.get(folder_name) or {}).get(ext.lstrip(".").lower(), {})
+    approach = str(entry.get("approach", "") or "").replace("|", ";").strip() or "—"
+    time_o = str(entry.get("time", "") or "").strip() or "—"
+    space_o = str(entry.get("space", "") or "").strip() or "—"
+    return html.escape(approach), time_o, space_o
 
 EXTENSIONS = {
     ".c": "C",
@@ -252,7 +273,7 @@ def format_metric(value, percentile):
 # --------------------------------------------------------------------------- #
 
 
-def shield(label, message, logo=None, style="flat-square"):
+def shield(label, message, logo=None, style="for-the-badge"):
     """A shields.io badge in the Carbon palette: carbon label, graphite value."""
     label_part = quote(str(label).upper(), safe="")
     message_part = quote(str(message), safe="")
@@ -268,20 +289,19 @@ def img(source, alt, width=None):
     return f'<img src="{source}" alt="{alt}"{size} />'
 
 
-def typing_svg(lines, size=17, width=620):
-    """Dark typing strip rendered in DejaVu Sans Bold on Carbon Black."""
+def typing_svg(lines, size=22, width=500):
+    """Grey typing strip on transparent background, profile style."""
     encoded_lines = ";".join(quote(line, safe="") for line in lines)
     return (
         "https://readme-typing-svg.demolab.com"
-        f"?font={DISPLAY_FONT_BOLD}"
+        f"?font={DISPLAY_FONT}"
+        "&weight=600"
         f"&size={size}"
-        "&pause=1200"
-        f"&color={PURE_WHITE}"
-        f"&background={CARBON_BLACK}"
+        "&pause=1000"
+        "&color=616161"
         "&center=true"
         "&vCenter=true"
         f"&width={width}"
-        "&duration=3400"
         f"&lines={encoded_lines}"
     )
 
@@ -332,6 +352,8 @@ def layout_tree(problem_count, example_folder, example_files):
 
     lines = [
         "leetcode-solutions/",
+        entry("├── ", "data/", ""),
+        entry("│   └── ", "problems.json", "approach + Big-O notes"),
         entry("├── ", "scripts/", ""),
         entry("│   └── ", "generate_readme.py", "builds this README"),
         entry("├── ", ".github/workflows/", ""),
@@ -417,7 +439,7 @@ def main():
                     "algorithms + data structures",
                 ]),
                 "Typing strip: solve, understand, improve",
-                width="620",
+                width="500",
             ),
             "",
             " ".join([
@@ -427,7 +449,7 @@ def main():
             ]),
             "",
             f'<a href="{LEETCODE_PROFILE_URL}">'
-            f'<img src="{LEETCODE_CARD_IMG}" alt="{LEETCODE_USERNAME}\'s LeetCode stats" />'
+            f'<img src="{LEETCODE_CARD_IMG}" alt="{LEETCODE_USERNAME}\'s LeetCode stats" width="420" />'
             "</a>",
             "",
             f'<a href="{REPOSITORY_URL}">Repository</a> · '
@@ -481,14 +503,7 @@ def main():
 
         heading = difficulty if difficulty != "Unknown" else "Other"
         noun = "problem" if len(items) == 1 else "problems"
-
-        lines += [
-            "<details>",
-            f"<summary><b>{heading}</b> — {len(items)} {noun}</summary>",
-            "",
-            "| # | Problem | Language | Time | Memory | Solution |",
-            "|---:|---|---|---|---|---|",
-        ]
+        lines += [f"### {heading} — {len(items)} {noun}", ""]
 
         for problem in items:
             performance = problem["performance"]
@@ -503,25 +518,48 @@ def main():
                 number = (
                     problem["number"] if problem["number"] is not None else "—"
                 )
-                runtime = format_metric(
-                    performance["runtime"],
-                    performance["runtime_percentile"],
+                runtime = performance["runtime"]
+                runtime_pct = performance["runtime_percentile"]
+                memory = performance["memory"]
+                memory_pct = performance["memory_percentile"]
+
+                runtime_cell = (
+                    f"<kbd>{runtime}</kbd> <sub>{runtime_pct}</sub>"
+                    if runtime_pct else f"<kbd>{runtime}</kbd>"
                 )
-                memory = format_metric(
-                    performance["memory"],
-                    performance["memory_percentile"],
+                memory_cell = (
+                    f"<kbd>{memory}</kbd> <sub>{memory_pct}</sub>"
+                    if memory_pct else f"<kbd>{memory}</kbd>"
                 )
 
-                problem_link = (
-                    f"[{problem['title']}]"
-                    f"({LEETCODE_URL}/problems/{quote(problem['slug'])}/)"
+                approach, time_o, space_o = complexity_for(
+                    problem["folder"].name, path.suffix
+                )
+                time_badge = (
+                    img(shield("Time", time_o), time_o)
+                    if time_o != "—" else "—"
+                )
+                space_badge = (
+                    img(shield("Space", space_o), space_o)
+                    if space_o != "—" else "—"
                 )
 
-                lines.append(
-                    f"| {number} | {problem_link} | {language} | {runtime} | {memory} | [View solution]({relative_solution}) |"
-                )
-
-        lines += ["", "</details>", ""]
+                title = f"{number}. {problem['title']}" if number != "—" else problem["title"]
+                lines += [
+                    "<details>",
+                    f"<summary><a href=\"{LEETCODE_URL}/problems/{quote(problem['slug'])}/\"><b>{title}</b></a> "
+                    f"{img(shield('Difficulty', difficulty), difficulty)} "
+                    f"{img(shield('Lang', language), language)}</summary>",
+                    "",
+                    f"> {approach}",
+                    "",
+                    "| Time | Space | Runtime | Memory | Solution |",
+                    "|---|---|---|---|---|",
+                    f"| {time_badge} | {space_badge} | {runtime_cell} | {memory_cell} | [View solution]({relative_solution}) |",
+                    "",
+                    "</details>",
+                    "",
+                ]
 
     lines += [
         "## Repository layout",
@@ -546,7 +584,11 @@ def main():
         "  `LEETCODE_SESSION` and `LEETCODE_CSRF_TOKEN` secrets, and falls back to",
         "  `Unknown` when those are unavailable;",
         "- the time and memory figures are parsed from the sync commit messages, so",
-        "  a problem shows `—` until it has been submitted at least once.",
+        "  a problem shows `—` until it has been submitted at least once;",
+        "- approach notes and Big-O figures are curated by hand in",
+        "  `data/problems.json` (keyed by folder and file extension) because neither",
+        "  the LeetCode API nor the synced files provide them — edit that file to",
+        "  correct a card, then rebuild.",
         "",
         "To rebuild locally:",
         "",
