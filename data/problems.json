@@ -67,6 +67,13 @@
       "time": "O(m+n)"
     }
   },
+  "0027-remove-element": {
+    "java": {
+      "approach": "shift left on match, in place",
+      "space": "O(1)",
+      "time": "O(n^2)"
+    }
+  },
   "0058-length-of-last-word": {
     "c": {
       "approach": "scan for last word start",
