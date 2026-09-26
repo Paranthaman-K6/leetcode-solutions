@@ -3,7 +3,7 @@
 
   <img src="https://readme-typing-svg.demolab.com?font=DejaVu+Sans&weight=600&size=22&pause=1000&color=616161&center=true&vCenter=true&width=500&lines=solve%20%E2%86%92%20understand%20%E2%86%92%20improve;one%20problem%20at%20a%20time;algorithms%20%2B%20data%20structures" alt="Typing strip: solve, understand, improve" width="500" />
 
-  <img src="https://img.shields.io/badge/PROBLEMS-19-2D2D2D?style=for-the-badge&labelColor=111111&logo=leetcode&logoColor=9E9E9E" alt="Problems: 19" /> <img src="https://img.shields.io/badge/SOLUTIONS-20-2D2D2D?style=for-the-badge&labelColor=111111&logo=github&logoColor=9E9E9E" alt="Solutions: 20" /> <img src="https://img.shields.io/badge/LANGUAGES-2-2D2D2D?style=for-the-badge&labelColor=111111" alt="Languages: 2" />
+  <img src="https://img.shields.io/badge/PROBLEMS-20-2D2D2D?style=for-the-badge&labelColor=111111&logo=leetcode&logoColor=9E9E9E" alt="Problems: 20" /> <img src="https://img.shields.io/badge/SOLUTIONS-21-2D2D2D?style=for-the-badge&labelColor=111111&logo=github&logoColor=9E9E9E" alt="Solutions: 21" /> <img src="https://img.shields.io/badge/LANGUAGES-2-2D2D2D?style=for-the-badge&labelColor=111111" alt="Languages: 2" />
 
   <a href="https://leetcode.com/u/paranthamank/"><img src="https://leetcard.jacoblin.cool/paranthamank?theme=dark&font=DejaVu%20Sans&ext=heatmap" alt="paranthamank's LeetCode stats" width="420" /></a>
 
@@ -28,23 +28,23 @@ cd leetcode-solutions
 ## Progress
 
 <div align="center">
-  <img src="https://img.shields.io/badge/EASY%2063%25-12-2D2D2D?style=for-the-badge&labelColor=111111" alt="Easy: 12" /> <img src="https://img.shields.io/badge/MEDIUM%2032%25-6-2D2D2D?style=for-the-badge&labelColor=111111" alt="Medium: 6" /> <img src="https://img.shields.io/badge/HARD%205%25-1-2D2D2D?style=for-the-badge&labelColor=111111" alt="Hard: 1" />
+  <img src="https://img.shields.io/badge/EASY%2065%25-13-2D2D2D?style=for-the-badge&labelColor=111111" alt="Easy: 13" /> <img src="https://img.shields.io/badge/MEDIUM%2030%25-6-2D2D2D?style=for-the-badge&labelColor=111111" alt="Medium: 6" /> <img src="https://img.shields.io/badge/HARD%205%25-1-2D2D2D?style=for-the-badge&labelColor=111111" alt="Hard: 1" />
 </div>
 
 | Problems | Solutions | Easy | Medium | Hard | Languages |
 |---:|---:|---:|---:|---:|---:|
-| **19** | **20** | **12** | **6** | **1** | **2** |
+| **20** | **21** | **13** | **6** | **1** | **2** |
 
 ### Languages
 
 | Language | Solutions |
 |---|---:|
 | C | 19 |
-| Java | 1 |
+| Java | 2 |
 
 ## Solutions
 
-### Easy — 12 problems
+### Easy — 13 problems
 
 <details>
 <summary><a href="https://leetcode.com/problems/two-sum/"><b>1. Two Sum</b></a> <img src="https://img.shields.io/badge/DIFFICULTY-Easy-2D2D2D?style=for-the-badge&labelColor=111111" alt="Easy" /> <img src="https://img.shields.io/badge/LANG-C-2D2D2D?style=for-the-badge&labelColor=111111" alt="C" /></summary>
@@ -98,6 +98,17 @@ cd leetcode-solutions
 | Time | Space | Runtime | Memory | Solution |
 |---|---|---|---|---|
 | <img src="https://img.shields.io/badge/TIME-O%28m%2Bn%29-2D2D2D?style=for-the-badge&labelColor=111111" alt="O(m+n)" /> | <img src="https://img.shields.io/badge/SPACE-O%28m%2Bn%29-2D2D2D?style=for-the-badge&labelColor=111111" alt="O(m+n)" /> | <kbd>0 ms</kbd> <sub>100.00%</sub> | <kbd>11.6 MB</kbd> <sub>8.90%</sub> | [View solution](0021-merge-two-sorted-lists/solution.c) |
+
+</details>
+
+<details>
+<summary><a href="https://leetcode.com/problems/remove-element/"><b>27. Remove Element</b></a> <img src="https://img.shields.io/badge/DIFFICULTY-Easy-2D2D2D?style=for-the-badge&labelColor=111111" alt="Easy" /> <img src="https://img.shields.io/badge/LANG-Java-2D2D2D?style=for-the-badge&labelColor=111111" alt="Java" /></summary>
+
+> shift left on match, in place
+
+| Time | Space | Runtime | Memory | Solution |
+|---|---|---|---|---|
+| <img src="https://img.shields.io/badge/TIME-O%28n%5E2%29-2D2D2D?style=for-the-badge&labelColor=111111" alt="O(n^2)" /> | <img src="https://img.shields.io/badge/SPACE-O%281%29-2D2D2D?style=for-the-badge&labelColor=111111" alt="O(1)" /> | <kbd>0 ms</kbd> <sub>100.00%</sub> | <kbd>43.4 MB</kbd> <sub>61.13%</sub> | [View solution](0027-remove-element/solution.java) |
 
 </details>
 
@@ -163,7 +174,7 @@ cd leetcode-solutions
 
 | Time | Space | Runtime | Memory | Solution |
 |---|---|---|---|---|
-| <img src="https://img.shields.io/badge/TIME-O%28n%29-2D2D2D?style=for-the-badge&labelColor=111111" alt="O(n)" /> | <img src="https://img.shields.io/badge/SPACE-O%28n%29-2D2D2D?style=for-the-badge&labelColor=111111" alt="O(n)" /> | <kbd>12 ms</kbd> <sub>72.80%</sub> | <kbd>12.2 MB</kbd> <sub>92.26%</sub> | [View solution](1580-shuffle-the-array/solution.c) |
+| <img src="https://img.shields.io/badge/TIME-O%28n%29-2D2D2D?style=for-the-badge&labelColor=111111" alt="O(n)" /> | <img src="https://img.shields.io/badge/SPACE-O%28n%29-2D2D2D?style=for-the-badge&labelColor=111111" alt="O(n)" /> | <kbd>0 ms</kbd> <sub>100.00%</sub> | <kbd>12.2 MB</kbd> <sub>92.26%</sub> | [View solution](1580-shuffle-the-array/solution.c) |
 
 </details>
 
@@ -284,7 +295,7 @@ leetcode-solutions/
 │   ├── README.md                       # problem statement
 │   ├── solution.c
 │   └── solution.java
-├── …                                   # 18 more problem folders
+├── …                                   # 19 more problem folders
 └── README.md                           # generated index
 ```
 
