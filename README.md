@@ -7,8 +7,8 @@
   <p><b>A continuously growing collection of accepted LeetCode solutions.</b></p>
 
   <img src="https://img.shields.io/badge/Problems-19-0f172a?style=for-the-badge&logo=leetcode&logoColor=orange" alt="Problems" />
-  <img src="https://img.shields.io/badge/Solutions-19-0f172a?style=for-the-badge&logo=github&logoColor=white" alt="Solutions" />
-  <img src="https://img.shields.io/badge/Languages-1-0f172a?style=for-the-badge" alt="Languages" />
+  <img src="https://img.shields.io/badge/Solutions-20-0f172a?style=for-the-badge&logo=github&logoColor=white" alt="Solutions" />
+  <img src="https://img.shields.io/badge/Languages-2-0f172a?style=for-the-badge" alt="Languages" />
 
   <a href="https://github.com/Paranthaman-K6/leetcode-solutions">Repository</a> · 
   <a href="https://leetcode.com/">LeetCode</a>
@@ -21,13 +21,14 @@
 
 | Problems | Solutions | Easy | Medium | Hard | Languages |
 |---:|---:|---:|---:|---:|---:|
-| **19** | **19** | **12** | **6** | **1** | **1** |
+| **19** | **20** | **12** | **6** | **1** | **2** |
 
 ### Languages
 
 | Language | Solutions |
 |---|---:|
 | C | 19 |
+| Java | 1 |
 
 ## Solutions
 
@@ -35,7 +36,8 @@
 
 | # | Problem | Language | Time | Memory | Solution |
 |---:|---|---|---|---|---|
-| 1 | [Two Sum](https://leetcode.com/problems/two-sum/) | C | 99 ms <sub>78.81%</sub> | 9.4 MB <sub>46.75%</sub> | [View solution](0001-two-sum/solution.c) |
+| 1 | [Two Sum](https://leetcode.com/problems/two-sum/) | C | 33 ms <sub>44.58%</sub> | 47.2 MB <sub>41.16%</sub> | [View solution](0001-two-sum/solution.c) |
+| 1 | [Two Sum](https://leetcode.com/problems/two-sum/) | Java | 33 ms <sub>44.58%</sub> | 47.2 MB <sub>41.16%</sub> | [View solution](0001-two-sum/solution.java) |
 | 9 | [Palindrome Number](https://leetcode.com/problems/palindrome-number/) | C | 0 ms <sub>100.00%</sub> | 8.8 MB <sub>62.57%</sub> | [View solution](0009-palindrome-number/solution.c) |
 | 20 | [Valid Parentheses](https://leetcode.com/problems/valid-parentheses/) | C | 0 ms <sub>100.00%</sub> | 8.7 MB <sub>67.84%</sub> | [View solution](0020-valid-parentheses/solution.c) |
 | 21 | [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/) | C | 0 ms <sub>100.00%</sub> | 11.6 MB <sub>8.90%</sub> | [View solution](0021-merge-two-sorted-lists/solution.c) |
