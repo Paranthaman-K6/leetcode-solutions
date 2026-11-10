@@ -6,11 +6,12 @@ this script after every LeetCode sync and commits the result. Edit this file,
 not README.md, or the changes will be overwritten on the next run.
 
 Visual theme: Carbon Terminal, matching the profile repo
-(https://github.com/Paranthaman-K6/Paranthaman-K6), rendered entirely through
-image APIs (no local assets, so there is nothing extra to commit or sync):
+(https://github.com/Paranthaman-K6/Paranthaman-K6):
   Carbon Black #111111  Graphite #2D2D2D  Ash Gray #9E9E9E  Pure White #FFFFFF
-  gradient capsule-render header/footer + grey readme-typing-svg strips +
-  for-the-badge shields.io chips + dark leetcard.
+The hero banner is a hand-authored, self-contained animated SVG
+(`assets/banner.svg`), so the top of the page does not depend on a third-party
+image API. The rest is for-the-badge shields.io chips, a dark leetcard, and
+progress bars drawn from block characters.
 
 Per-problem approach notes and Big-O figures are curated in
 `data/problems.json` (the LeetCode API does not provide them and the synced
@@ -43,18 +44,7 @@ DISPLAY_FONT_BOLD = "DejaVu+Sans+Bold"
 LEETCODE_USERNAME = os.environ.get("LEETCODE_USERNAME", "").strip() or "paranthamank"
 LEETCODE_PROFILE_URL = f"{LEETCODE_URL}/u/{LEETCODE_USERNAME}/"
 
-HEADER_IMG = (
-    "https://capsule-render.vercel.app/api"
-    "?type=waving&color=0:2D2D2D,100:111111&height=200&section=header"
-    "&text=LeetCode%20Solutions&fontSize=50&fontColor=FFFFFF"
-    "&animation=fadeIn&fontAlignY=35"
-    "&desc=DSA%20%7C%20Problem%20Solving%20%7C%20Continuous%20Learning"
-    "&descSize=16&descAlignY=55"
-)
-FOOTER_IMG = (
-    "https://capsule-render.vercel.app/api"
-    "?type=waving&color=0:2D2D2D,100:111111&height=120&section=footer"
-)
+BANNER_IMG = "assets/banner.svg"
 LEETCODE_CARD_IMG = (
     f"https://leetcard.jacoblin.cool/{quote(LEETCODE_USERNAME, safe='')}"
     "?theme=dark&font=DejaVu%20Sans&ext=heatmap"
@@ -212,8 +202,20 @@ def fetch_difficulties(slugs):
     session = os.environ.get("LEETCODE_SESSION", "").strip()
     csrf_token = os.environ.get("LEETCODE_CSRF_TOKEN", "").strip()
 
-    if not session or not csrf_token or not slugs:
+    if not slugs:
         return {}
+
+    headers = {
+        "Content-Type": "application/json",
+        "Origin": "https://leetcode.com",
+        "Referer": "https://leetcode.com/",
+        "User-Agent": "Mozilla/5.0",
+    }
+    # Public question metadata needs no credentials; send the session when the
+    # workflow provides one so the sync account's view is used.
+    if session and csrf_token:
+        headers["Cookie"] = f"csrftoken={csrf_token}; LEETCODE_SESSION={session};"
+        headers["x-csrftoken"] = csrf_token
 
     results = {}
 
@@ -232,14 +234,7 @@ def fetch_difficulties(slugs):
             "https://leetcode.com/graphql/",
             data=payload,
             method="POST",
-            headers={
-                "Content-Type": "application/json",
-                "Origin": "https://leetcode.com",
-                "Referer": "https://leetcode.com/",
-                "User-Agent": "Mozilla/5.0",
-                "Cookie": f"csrftoken={csrf_token}; LEETCODE_SESSION={session};",
-                "x-csrftoken": csrf_token,
-            },
+            headers=headers,
         )
 
         try:
@@ -289,55 +284,36 @@ def img(source, alt, width=None):
     return f'<img src="{source}" alt="{alt}"{size} />'
 
 
-def typing_svg(lines, size=22, width=500):
-    """Grey typing strip on transparent background, profile style."""
-    encoded_lines = ";".join(quote(line, safe="") for line in lines)
-    return (
-        "https://readme-typing-svg.demolab.com"
-        f"?font={DISPLAY_FONT}"
-        "&weight=600"
-        f"&size={size}"
-        "&pause=1000"
-        "&color=616161"
-        "&center=true"
-        "&vCenter=true"
-        f"&width={width}"
-        f"&lines={encoded_lines}"
-    )
-
-
 def center(lines):
     body = "\n".join(f"  {line}" if line else "" for line in lines)
     return f'<div align="center">\n{body}\n</div>'
 
 
-def progress_bars(difficulty_counts, problem_count):
-    """One graphite chip per known difficulty, carrying its share of the index.
+def bar(count, total, width=12):
+    """Text progress bar, so shares need no image round-trip."""
+    if not total:
+        return ""
+    filled = round(count * width / total)
+    if count and not filled:
+        filled = 1
+    return "█" * filled + "░" * (width - filled)
 
-    Stays silent when no difficulty metadata is available, so a local run
-    without LeetCode credentials does not render a meaningless "Other 100%" bar.
-    """
-    if not problem_count:
-        return []
 
-    known = {
-        difficulty: count
-        for difficulty, count in difficulty_counts.items()
-        if difficulty != "Unknown"
-    }
-    if not known:
-        return []
+def share(count, total):
+    return f"{round(count * 100 / total)}%" if total else "—"
 
-    badges = []
-    for difficulty in ("Easy", "Medium", "Hard"):
-        count = known.get(difficulty, 0)
-        if not count:
-            continue
-        share = round(count * 100 / problem_count)
-        badges.append(
-            img(shield(f"{difficulty} {share}%", count), f"{difficulty}: {count}")
+
+def share_table(rows, label_header, total):
+    """`| label | count | share bar |` — one row per known bucket."""
+    lines = [
+        f"| {label_header} | Solved | Share |",
+        "|---|---:|---|",
+    ]
+    for label, count in rows:
+        lines.append(
+            f"| {label} | **{count}** | `{bar(count, total)}` {share(count, total)} |"
         )
-    return badges
+    return lines
 
 
 def layout_tree(problem_count, example_folder, example_files):
@@ -352,6 +328,8 @@ def layout_tree(problem_count, example_folder, example_files):
 
     lines = [
         "leetcode-solutions/",
+        entry("├── ", "assets/", ""),
+        entry("│   └── ", "banner.svg", "animated hero (hand-authored)"),
         entry("├── ", "data/", ""),
         entry("│   └── ", "problems.json", "approach + Big-O notes"),
         entry("├── ", "scripts/", ""),
@@ -425,22 +403,15 @@ def main():
         [path.name for path in problem_list[0]["solutions"]] if problem_list else []
     )
 
-    bars = progress_bars(difficulty_counts, problem_count)
-    progress_block = [center([" ".join(bars)]), ""] if bars else []
+    known_difficulties = [
+        (difficulty, difficulty_counts[difficulty])
+        for difficulty in ("Easy", "Medium", "Hard")
+        if difficulty_counts.get(difficulty)
+    ]
 
     lines = [
         center([
-            img(HEADER_IMG, "Animated LeetCode header"),
-            "",
-            img(
-                typing_svg([
-                    "solve → understand → improve",
-                    "one problem at a time",
-                    "algorithms + data structures",
-                ]),
-                "Typing strip: solve, understand, improve",
-                width="500",
-            ),
+            img(BANNER_IMG, "leetcode-solutions: an animated terminal banner", width="880"),
             "",
             " ".join([
                 img(shield("Problems", problem_count, logo="leetcode"), f"Problems: {problem_count}"),
@@ -473,28 +444,33 @@ def main():
         "",
         "## Progress",
         "",
-        *progress_block,
-        "| Problems | Solutions | Easy | Medium | Hard | Languages |",
-        "|---:|---:|---:|---:|---:|---:|",
-        "| **{}** | **{}** | **{}** | **{}** | **{}** | **{}** |".format(
-            problem_count,
-            solution_count,
-            difficulty_counts.get("Easy", 0),
-            difficulty_counts.get("Medium", 0),
-            difficulty_counts.get("Hard", 0),
-            len(language_counts),
-        ),
-        "",
-        "### Languages",
-        "",
-        "| Language | Solutions |",
-        "|---|---:|",
     ]
 
-    for language, count in sorted(language_counts.items(), key=lambda kv: (-kv[1], kv[0])):
-        lines.append(f"| {language} | {count} |")
+    if known_difficulties:
+        lines += [
+            *share_table(known_difficulties, "Difficulty", problem_count),
+            "",
+        ]
+    else:
+        lines += [
+            "| Problems | Solutions | Languages |",
+            "|---:|---:|---:|",
+            f"| **{problem_count}** | **{solution_count}** | **{len(language_counts)}** |",
+            "",
+        ]
 
-    lines += ["", "## Solutions", ""]
+    lines += [
+        "### Languages",
+        "",
+        *share_table(
+            sorted(language_counts.items(), key=lambda kv: (-kv[1], kv[0])),
+            "Language",
+            solution_count,
+        ),
+        "",
+        "## Solutions",
+        "",
+    ]
 
     for difficulty in ("Easy", "Medium", "Hard", "Unknown"):
         items = [p for p in problem_list if p["difficulty"] == difficulty]
@@ -503,63 +479,51 @@ def main():
 
         heading = difficulty if difficulty != "Unknown" else "Other"
         noun = "problem" if len(items) == 1 else "problems"
-        lines += [f"### {heading} — {len(items)} {noun}", ""]
+        lines += [
+            f"### {heading} — {len(items)} {noun}",
+            "",
+            "| # | Problem | Lang | Time | Space | Runtime | Memory | Solution |",
+            "|---:|---|---|---|---|---|---|---|",
+        ]
 
         for problem in items:
-            performance = problem["performance"]
+            number = problem["number"] if problem["number"] is not None else "—"
+            title = problem["title"]
+            link = f"{LEETCODE_URL}/problems/{quote(problem['slug'])}/"
 
-            for path in sorted(problem["solutions"], key=lambda p: str(p).lower()):
+            solutions = sorted(problem["solutions"], key=lambda p: str(p).lower())
+            for index, path in enumerate(solutions):
+                performance = problem["performance"]
                 language = EXTENSIONS[path.suffix.lower()]
-                relative_solution = quote(
-                    path.relative_to(ROOT).as_posix(),
-                    safe="/",
-                )
-
-                number = (
-                    problem["number"] if problem["number"] is not None else "—"
-                )
-                runtime = performance["runtime"]
-                runtime_pct = performance["runtime_percentile"]
-                memory = performance["memory"]
-                memory_pct = performance["memory_percentile"]
-
-                runtime_cell = (
-                    f"<kbd>{runtime}</kbd> <sub>{runtime_pct}</sub>"
-                    if runtime_pct else f"<kbd>{runtime}</kbd>"
-                )
-                memory_cell = (
-                    f"<kbd>{memory}</kbd> <sub>{memory_pct}</sub>"
-                    if memory_pct else f"<kbd>{memory}</kbd>"
-                )
-
+                relative_solution = quote(path.relative_to(ROOT).as_posix(), safe="/")
                 approach, time_o, space_o = complexity_for(
                     problem["folder"].name, path.suffix
                 )
-                time_badge = (
-                    img(shield("Time", time_o), time_o)
-                    if time_o != "—" else "—"
-                )
-                space_badge = (
-                    img(shield("Space", space_o), space_o)
-                    if space_o != "—" else "—"
+
+                # Only the first row of a problem carries its number, title and
+                # approach; extra languages continue the same block.
+                if index == 0:
+                    problem_cell = (
+                        f"[{title}]({link})<br><sub>{approach}</sub>"
+                    )
+                    number_cell = number
+                else:
+                    problem_cell = f"↳ [same problem]({link})"
+                    number_cell = ""
+
+                runtime_cell = performance["runtime"]
+                if performance["runtime_percentile"]:
+                    runtime_cell += f" <sub>{performance['runtime_percentile']}</sub>"
+                memory_cell = performance["memory"]
+                if performance["memory_percentile"]:
+                    memory_cell += f" <sub>{performance['memory_percentile']}</sub>"
+
+                lines.append(
+                    f"| {number_cell} | {problem_cell} | {language} | `{time_o}` | `{space_o}` "
+                    f"| {runtime_cell} | {memory_cell} | [{language}]({relative_solution}) |"
                 )
 
-                title = f"{number}. {problem['title']}" if number != "—" else problem["title"]
-                lines += [
-                    "<details>",
-                    f"<summary><a href=\"{LEETCODE_URL}/problems/{quote(problem['slug'])}/\"><b>{title}</b></a> "
-                    f"{img(shield('Difficulty', difficulty), difficulty)} "
-                    f"{img(shield('Lang', language), language)}</summary>",
-                    "",
-                    f"> {approach}",
-                    "",
-                    "| Time | Space | Runtime | Memory | Solution |",
-                    "|---|---|---|---|---|",
-                    f"| {time_badge} | {space_badge} | {runtime_cell} | {memory_cell} | [View solution]({relative_solution}) |",
-                    "",
-                    "</details>",
-                    "",
-                ]
+        lines.append("")
 
     lines += [
         "## Repository layout",
@@ -568,7 +532,8 @@ def main():
         *layout_tree(problem_count, example_folder, example_files),
         "```",
         "",
-        "## How this index is built",
+        "<details>",
+        "<summary><b>How this index is built</b></summary>",
         "",
         "`.github/workflows/sync_leetcode.yml` runs on demand and does three things:",
         "",
@@ -580,9 +545,8 @@ def main():
         "",
         "- a folder is indexed only when it holds a `README.md` and at least one",
         "  solution file, which keeps the index honest as the repository grows;",
-        "- difficulty comes from the LeetCode GraphQL API using the",
-        "  `LEETCODE_SESSION` and `LEETCODE_CSRF_TOKEN` secrets, and falls back to",
-        "  `Unknown` when those are unavailable;",
+        "- difficulty comes from the public LeetCode GraphQL question metadata, and",
+        "  falls back to `Unknown` when the request fails;",
         "- the time and memory figures are parsed from the sync commit messages, so",
         "  a problem shows `—` until it has been submitted at least once;",
         "- approach notes and Big-O figures are curated by hand in",
@@ -593,16 +557,14 @@ def main():
         "To rebuild locally:",
         "",
         "```bash",
-        "export LEETCODE_SESSION=…",
-        "export LEETCODE_CSRF_TOKEN=…",
         "python scripts/generate_readme.py",
         "```",
+        "",
+        "</details>",
         "",
         "---",
         "",
         center([
-            img(FOOTER_IMG, "Animated footer"),
-            "",
             "<sub>Automatically synchronized · Automatically indexed · Built for learning</sub>",
         ]),
         "",
