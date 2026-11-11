@@ -1,17 +1,9 @@
 #!/usr/bin/env python3
-"""Generate the root README.md for this repository.
+"""Generate README.md and assets/progress.svg for this repository.
 
-The README is a generated artifact: `.github/workflows/sync_leetcode.yml` runs
-this script after every LeetCode sync and commits the result. Edit this file,
-not README.md, or the changes will be overwritten on the next run.
-
-Visual theme: Carbon Terminal, matching the profile repo
-(https://github.com/Paranthaman-K6/Paranthaman-K6):
-  Carbon Black #111111  Graphite #2D2D2D  Ash Gray #9E9E9E  Pure White #FFFFFF
-The hero banner is a hand-authored, self-contained animated SVG
-(`assets/banner.svg`), so the top of the page does not depend on a third-party
-image API. The rest is for-the-badge shields.io chips, a dark leetcard, and
-progress bars drawn from block characters.
+Both files are generated artifacts: `.github/workflows/sync_leetcode.yml` runs
+this script after each LeetCode sync and commits the result. Edit this file,
+not the generated files.
 
 Per-problem approach notes and Big-O figures are curated in
 `data/problems.json` (the LeetCode API does not provide them and the synced
@@ -24,31 +16,31 @@ import re
 import subprocess
 import urllib.error
 import urllib.request
-from collections import Counter, defaultdict
+from collections import Counter
 from pathlib import Path
 from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
+PROGRESS = ROOT / "assets" / "progress.svg"
 
 REPOSITORY_URL = "https://github.com/Paranthaman-K6/leetcode-solutions"
 LEETCODE_URL = "https://leetcode.com"
 CARBON_BLACK = "111111"
 GRAPHITE = "2D2D2D"
 ASH_GRAY = "9E9E9E"
-PURE_WHITE = "FFFFFF"
-
-DISPLAY_FONT = "DejaVu+Sans"
-DISPLAY_FONT_BOLD = "DejaVu+Sans+Bold"
 
 LEETCODE_USERNAME = os.environ.get("LEETCODE_USERNAME", "").strip() or "paranthamank"
 LEETCODE_PROFILE_URL = f"{LEETCODE_URL}/u/{LEETCODE_USERNAME}/"
 
 BANNER_IMG = "assets/banner.svg"
-LEETCODE_CARD_IMG = (
-    f"https://leetcard.jacoblin.cool/{quote(LEETCODE_USERNAME, safe='')}"
-    "?theme=dark&font=DejaVu%20Sans&ext=heatmap"
-)
+PROGRESS_IMG = "assets/progress.svg"
+
+DIFFICULTY_COLORS = {
+    "Easy": ("#ffffff", "#ffffff"),
+    "Medium": ("#bdbdbd", "#bdbdbd"),
+    "Hard": ("#8a8a8a", "#8a8a8a"),
+}
 
 
 def load_complexity():
@@ -64,10 +56,11 @@ COMPLEXITY = load_complexity()
 
 def complexity_for(folder_name, ext):
     entry = (COMPLEXITY.get(folder_name) or {}).get(ext.lstrip(".").lower(), {})
-    approach = str(entry.get("approach", "") or "").replace("|", ";").strip() or "—"
-    time_o = str(entry.get("time", "") or "").strip() or "—"
-    space_o = str(entry.get("space", "") or "").strip() or "—"
-    return html.escape(approach), time_o, space_o
+    approach = str(entry.get("approach", "") or "").replace("|", ";").strip()
+    time_o = str(entry.get("time", "") or "").strip()
+    space_o = str(entry.get("space", "") or "").strip()
+    return approach, time_o, space_o
+
 
 EXTENSIONS = {
     ".c": "C",
@@ -142,6 +135,7 @@ def problem_slug(folder_name):
 
 
 def clean_problem_title(folder):
+    """Readable fallback title when the LeetCode API is unavailable."""
     problem_readme = folder / "README.md"
 
     try:
@@ -157,9 +151,16 @@ def clean_problem_title(folder):
         if title:
             return title
 
-    slug = problem_slug(folder.name)
-    title = slug.replace("-", " ").replace("_", " ")
-    return " ".join(word.capitalize() for word in title.split())
+    minor_words = {"a", "an", "and", "for", "from", "in", "of", "the", "to"}
+    words = problem_slug(folder.name).replace("_", " ").split()
+    title_words = []
+    for index, word in enumerate(words):
+        lowered = word.lower()
+        if index and lowered in minor_words:
+            title_words.append(lowered)
+        else:
+            title_words.append(lowered.capitalize())
+    return " ".join(title_words)
 
 
 def get_git_performance(folder):
@@ -198,7 +199,7 @@ def empty_performance():
     }
 
 
-def fetch_difficulties(slugs):
+def fetch_metadata(slugs):
     session = os.environ.get("LEETCODE_SESSION", "").strip()
     csrf_token = os.environ.get("LEETCODE_CSRF_TOKEN", "").strip()
 
@@ -222,7 +223,7 @@ def fetch_difficulties(slugs):
     for start in range(0, len(slugs), 20):
         chunk = slugs[start : start + 20]
         fields = [
-            f"q{index}: question(titleSlug: {json.dumps(slug)}) {{ difficulty }}"
+            f"q{index}: question(titleSlug: {json.dumps(slug)}) {{ title difficulty }}"
             for index, slug in enumerate(chunk)
         ]
 
@@ -241,47 +242,44 @@ def fetch_difficulties(slugs):
             with urllib.request.urlopen(request, timeout=20) as response:
                 body = json.loads(response.read().decode("utf-8"))
 
-            data = body.get("data", {})
+            data = body.get("data") or {}
             for index, slug in enumerate(chunk):
                 item = data.get(f"q{index}") or {}
                 difficulty = item.get("difficulty")
-                results[slug] = (
-                    difficulty if difficulty in DIFFICULTY_ORDER else "Unknown"
-                )
+                results[slug] = {
+                    "title": html.unescape(str(item.get("title") or "")).strip(),
+                    "difficulty": (
+                        difficulty if difficulty in DIFFICULTY_ORDER else "Unknown"
+                    ),
+                }
 
         except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError):
-            print("Warning: could not fetch LeetCode difficulty metadata.")
+            print("Warning: could not fetch LeetCode question metadata.")
             for slug in chunk:
-                results.setdefault(slug, "Unknown")
+                results.setdefault(slug, {"title": "", "difficulty": "Unknown"})
 
     return results
 
 
-def format_metric(value, percentile):
-    if value == "—":
-        return "—"
-    return f"{value} <sub>{percentile}</sub>" if percentile else value
-
-
 # --------------------------------------------------------------------------- #
-# Carbon theme helpers
+# Rendering helpers
 # --------------------------------------------------------------------------- #
 
 
-def shield(label, message, logo=None, style="for-the-badge"):
-    """A shields.io badge in the Carbon palette: carbon label, graphite value."""
-    label_part = quote(str(label).upper(), safe="")
-    message_part = quote(str(message), safe="")
-    params = [f"style={style}", f"labelColor={CARBON_BLACK}"]
+def shield(label, message, logo=None, color=GRAPHITE, logo_color=ASH_GRAY):
+    """A shields.io badge in the Carbon palette."""
+    label_part = quote(str(label).upper().replace("-", "--"), safe="")
+    message_part = quote(str(message).replace("-", "--").replace("_", "__"), safe="")
+    params = ["style=for-the-badge", f"labelColor={CARBON_BLACK}"]
     if logo:
-        params += [f"logo={logo}", f"logoColor={ASH_GRAY}"]
+        params += [f"logo={logo}", f"logoColor={logo_color}"]
     query = "&".join(params)
-    return f"https://img.shields.io/badge/{label_part}-{message_part}-{GRAPHITE}?{query}"
+    return f"https://img.shields.io/badge/{label_part}-{message_part}-{color}?{query}"
 
 
 def img(source, alt, width=None):
     size = f' width="{width}"' if width else ""
-    return f'<img src="{source}" alt="{alt}"{size} />'
+    return f'<img src="{source}" alt="{html.escape(alt, quote=True)}"{size} />'
 
 
 def center(lines):
@@ -289,70 +287,131 @@ def center(lines):
     return f'<div align="center">\n{body}\n</div>'
 
 
-def bar(count, total, width=12):
-    """Text progress bar, so shares need no image round-trip."""
-    if not total:
-        return ""
-    filled = round(count * width / total)
-    if count and not filled:
-        filled = 1
-    return "█" * filled + "░" * (width - filled)
+def pretty_big_o(value):
+    return value.replace("^2", "²").replace("^3", "³")
 
 
-def share(count, total):
-    return f"{round(count * 100 / total)}%" if total else "—"
+def format_approach(approach):
+    return html.escape(approach).replace(", ", " · ")
 
 
-def share_table(rows, label_header, total):
-    """`| label | count | share bar |` — one row per known bucket."""
-    lines = [
-        f"| {label_header} | Solved | Share |",
-        "|---|---:|---|",
-    ]
-    for label, count in rows:
-        lines.append(
-            f"| {label} | **{count}** | `{bar(count, total)}` {share(count, total)} |"
-        )
-    return lines
+def format_metric(value, percentile):
+    if value in {"", "—"}:
+        return "—"
+    value = value.replace("|", "\\|")
+    percentile = percentile.replace("|", "\\|")
+    return f"{value} <sub>{percentile}</sub>" if percentile else value
 
 
-def layout_tree(problem_count, example_folder, example_files):
-    """Repository layout, derived from what is actually on disk."""
-    comment_column = 40
+def progress_svg(problem_count, solution_count, language_counts, difficulty_counts):
+    total = max(problem_count, 1)
+    rows = []
 
-    def entry(prefix, name, comment):
-        if not comment:
-            return f"{prefix}{name}"
-        padding = max(1, comment_column - len(prefix) - len(name))
-        return f"{prefix}{name}{' ' * padding}# {comment}"
+    for index, difficulty in enumerate(("Easy", "Medium", "Hard")):
+        count = difficulty_counts.get(difficulty, 0)
+        percentage = round(count * 100 / total) if problem_count else 0
+        bar_y = 94 + index * 56
+        width = max(10, round(count / total * 812)) if count else 0
+        base, light = DIFFICULTY_COLORS[difficulty]
 
-    lines = [
-        "leetcode-solutions/",
-        entry("├── ", "assets/", ""),
-        entry("│   └── ", "banner.svg", "animated hero (hand-authored)"),
-        entry("├── ", "data/", ""),
-        entry("│   └── ", "problems.json", "approach + Big-O notes"),
-        entry("├── ", "scripts/", ""),
-        entry("│   └── ", "generate_readme.py", "builds this README"),
-        entry("├── ", ".github/workflows/", ""),
-        entry("│   └── ", "sync_leetcode.yml", "sync + regenerate + commit"),
-    ]
-
-    if example_folder:
-        lines.append(entry("├── ", f"{example_folder}/", ""))
-        lines.append(entry("│   ├── ", "README.md", "problem statement"))
-        for index, name in enumerate(example_files):
-            branch = "└── " if index == len(example_files) - 1 else "├── "
-            lines.append(entry(f"│   {branch}", name, ""))
-
-    if problem_count > 1:
-        plural = "folder" if problem_count == 2 else "folders"
-        lines.append(
-            entry("├── ", "…", f"{problem_count - 1} more problem {plural}")
+        rows.append(
+            f'    <circle cx="62" cy="{bar_y + 6}" r="4" fill="{base}"/>\n'
+            f'    <text x="80" y="{bar_y + 11}" class="sans" font-size="15" '
+            f'font-weight="600" fill="#f2f2f2">{difficulty}</text>\n'
+            f'    <text x="210" y="{bar_y + 11}" text-anchor="end" class="terminal" '
+            f'font-size="15" fill="#e6e6e6">{count}</text>\n'
+            f'    <rect x="240" y="{bar_y}" width="812" height="12" rx="6" fill="#2d2d2d"/>\n'
+            f'    <rect class="bar d{index + 1}" x="240" y="{bar_y}" width="{width}" '
+            f'height="12" rx="6" fill="url(#g-{difficulty.lower()})"/>\n'
+            f'    <text x="1144" y="{bar_y + 11}" text-anchor="end" class="terminal" '
+            f'font-size="14" font-weight="700" fill="{light}">{percentage}%</text>'
         )
 
-    lines.append(entry("└── ", "README.md", "generated index"))
-    return lines
+    language_parts = []
+    language_x = 154
+    for language, count in sorted(language_counts.items(), key=lambda kv: (-kv[1], kv[0])):
+        label = f"{language} · {count}"
+        color = "#9e9e9e" if language == "Java" else "#ffffff"
+        language_parts.append(
+            f'    <circle cx="{language_x}" cy="251" r="3" fill="{color}"/>\n'
+            f'    <text x="{language_x + 10}" y="255" class="terminal" font-size="11" '
+            f'fill="#bdbdbd">{html.escape(label)}</text>'
+        )
+        language_x += 28 + round(len(label) * 6.6)
+
+    alt = (
+        f"Progress: {difficulty_counts.get('Easy', 0)} easy, "
+        f"{difficulty_counts.get('Medium', 0)} medium, "
+        f"{difficulty_counts.get('Hard', 0)} hard; "
+        f"{problem_count} problems, {solution_count} solutions, "
+        f"{len(language_counts)} languages."
+    )
+
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" width="1200" height="280" role="img" aria-label="{html.escape(alt, quote=True)}">
+  <title>Progress</title>
+  <desc>{html.escape(alt)}</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#151515"/>
+      <stop offset=".55" stop-color="#0b0b0b"/>
+      <stop offset="1" stop-color="#101010"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".5"/>
+      <stop offset=".55" stop-color="#2d2d2d" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#2d2d2d" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="g-easy" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d6d6d6"/>
+    </linearGradient>
+    <linearGradient id="g-medium" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#bdbdbd"/>
+      <stop offset="1" stop-color="#8a8a8a"/>
+    </linearGradient>
+    <linearGradient id="g-hard" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a8a8a"/>
+      <stop offset="1" stop-color="#5a5a5a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".07"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#ffffff" opacity=".05"/>
+    </pattern>
+    <style>
+      .terminal {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }}
+      .sans {{ font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }}
+      .bar {{
+        transform-box: fill-box;
+        transform-origin: left center;
+        animation: grow .9s cubic-bezier(.2, .8, .2, 1) both;
+      }}
+      .d1 {{ animation-delay: .2s; }}
+      .d2 {{ animation-delay: .35s; }}
+      .d3 {{ animation-delay: .5s; }}
+      @keyframes grow {{ from {{ transform: scaleX(0); }} }}
+      @media (prefers-reduced-motion: reduce) {{ .bar {{ animation: none; }} }}
+    </style>
+  </defs>
+
+  <rect x="1" y="1" width="1198" height="278" rx="22" fill="url(#bg)" stroke="#2d2d2d"/>
+  <rect x="1" y="1" width="1198" height="278" rx="22" fill="url(#dots)"/>
+  <ellipse cx="1090" cy="0" rx="300" ry="190" fill="url(#glow)"/>
+  <rect x="1" y="1" width="1198" height="3" rx="1.5" fill="url(#edge)"/>
+
+  <text x="56" y="54" class="terminal" font-size="11" fill="#9e9e9e" letter-spacing="2">SOLVED BY DIFFICULTY</text>
+  <text x="1144" y="54" text-anchor="end" class="terminal" font-size="11" fill="#6e6e6e">{problem_count} PROBLEMS · {solution_count} SOLUTIONS</text>
+
+{chr(10).join(rows)}
+
+  <line x1="56" y1="236" x2="1144" y2="236" stroke="#2d2d2d"/>
+  <text x="56" y="255" class="terminal" font-size="10" fill="#9e9e9e" letter-spacing="1.6">LANGUAGES</text>
+{chr(10).join(language_parts)}
+  <text x="1144" y="255" text-anchor="end" class="terminal" font-size="11" fill="#6e6e6e">solve · understand · improve</text>
+</svg>
+'''
 
 
 # --------------------------------------------------------------------------- #
@@ -379,10 +438,13 @@ def main():
         problems[key]["solutions"].append(path)
 
     slugs = sorted({problem["slug"] for problem in problems.values()})
-    difficulties = fetch_difficulties(slugs)
+    metadata = fetch_metadata(slugs)
 
     for problem in problems.values():
-        problem["difficulty"] = difficulties.get(problem["slug"], "Unknown")
+        item = metadata.get(problem["slug"]) or {}
+        if item.get("title"):
+            problem["title"] = item["title"]
+        problem["difficulty"] = item.get("difficulty", "Unknown")
 
     problem_list = sorted(
         problems.values(),
@@ -398,77 +460,89 @@ def main():
     language_counts = Counter(EXTENSIONS[path.suffix.lower()] for path in files)
     difficulty_counts = Counter(problem["difficulty"] for problem in problem_list)
 
-    example_folder = problem_list[0]["folder"].name if problem_list else None
-    example_files = (
-        [path.name for path in problem_list[0]["solutions"]] if problem_list else []
+    PROGRESS.parent.mkdir(parents=True, exist_ok=True)
+    PROGRESS.write_text(
+        progress_svg(
+            problem_count,
+            solution_count,
+            language_counts,
+            difficulty_counts,
+        ),
+        encoding="utf-8",
     )
 
-    known_difficulties = [
-        (difficulty, difficulty_counts[difficulty])
-        for difficulty in ("Easy", "Medium", "Hard")
-        if difficulty_counts.get(difficulty)
-    ]
+    nav_links = []
+    for difficulty in ("Easy", "Medium", "Hard", "Unknown"):
+        if not difficulty_counts.get(difficulty):
+            continue
+        label = difficulty if difficulty != "Unknown" else "More"
+        anchor = "more" if difficulty == "Unknown" else difficulty.lower()
+        nav_links.append(f'<a href="#{anchor}">{label}</a>')
+    nav_links.append(f'<a href="{LEETCODE_PROFILE_URL}">LeetCode profile</a>')
+
+    progress_alt = (
+        f"Progress: {difficulty_counts.get('Easy', 0)} easy, "
+        f"{difficulty_counts.get('Medium', 0)} medium, "
+        f"{difficulty_counts.get('Hard', 0)} hard"
+    )
+
+    language_names = sorted(language_counts)
+    if len(language_names) == 1:
+        language_phrase = language_names[0]
+    elif len(language_names) == 2:
+        language_phrase = f"{language_names[0]} and {language_names[1]}"
+    elif language_names:
+        language_phrase = ", ".join(language_names[:-1]) + f", and {language_names[-1]}"
+    else:
+        language_phrase = "multiple languages"
+
+    progress_summary = (
+        f"{difficulty_counts.get('Easy', 0)} easy · "
+        f"{difficulty_counts.get('Medium', 0)} medium · "
+        f"{difficulty_counts.get('Hard', 0)} hard · "
+        f"{solution_count} solutions in {language_phrase}"
+    )
 
     lines = [
         center([
-            img(BANNER_IMG, "leetcode-solutions: an animated terminal banner", width="880"),
-            "",
+            img(
+                BANNER_IMG,
+                "LeetCode Solutions — a growing archive of accepted solutions in C and Java",
+                width="100%",
+            ),
+            "<br /><br />",
             " ".join([
-                img(shield("Problems", problem_count, logo="leetcode"), f"Problems: {problem_count}"),
-                img(shield("Solutions", solution_count, logo="github"), f"Solutions: {solution_count}"),
-                img(shield("Languages", len(language_counts)), f"Languages: {len(language_counts)}"),
+                img(
+                    shield("Problems", problem_count, logo="leetcode", logo_color=ASH_GRAY),
+                    f"Problems: {problem_count}",
+                ),
+                img(
+                    shield("Solutions", solution_count, logo="github"),
+                    f"Solutions: {solution_count}",
+                ),
+                img(
+                    shield("Languages", len(language_counts)),
+                    f"Languages: {len(language_counts)}",
+                ),
             ]),
-            "",
-            f'<a href="{LEETCODE_PROFILE_URL}">'
-            f'<img src="{LEETCODE_CARD_IMG}" alt="{LEETCODE_USERNAME}\'s LeetCode stats" width="420" />'
-            "</a>",
-            "",
-            f'<a href="{REPOSITORY_URL}">Repository</a> · '
-            f'<a href="{LEETCODE_PROFILE_URL}">LeetCode profile</a>',
+            "<br /><br />",
+            " · ".join(nav_links),
         ]),
         "",
-        "---",
+        "## Every solution, in one place.",
         "",
-        "## Overview",
-        "",
-        "> A continuously growing index of accepted LeetCode solutions.",
-        ">",
-        "> Each problem lives in its own folder with the original statement, one file",
-        "> per language, and the runtime and memory figures reported by LeetCode at",
-        "> submission time.",
-        "",
-        "```bash",
-        f"git clone {REPOSITORY_URL}.git",
-        "cd leetcode-solutions",
-        "```",
+        "A growing archive of accepted **LeetCode** solutions in **C** and **Java**.",
+        "Each problem includes its original statement, clean and readable code, and the",
+        "runtime and memory measured on LeetCode — so every approach is easy to compare.",
         "",
         "## Progress",
         "",
-    ]
-
-    if known_difficulties:
-        lines += [
-            *share_table(known_difficulties, "Difficulty", problem_count),
-            "",
-        ]
-    else:
-        lines += [
-            "| Problems | Solutions | Languages |",
-            "|---:|---:|---:|",
-            f"| **{problem_count}** | **{solution_count}** | **{len(language_counts)}** |",
-            "",
-        ]
-
-    lines += [
-        "### Languages",
-        "",
-        *share_table(
-            sorted(language_counts.items(), key=lambda kv: (-kv[1], kv[0])),
-            "Language",
-            solution_count,
-        ),
+        center([img(PROGRESS_IMG, progress_alt, width="100%")]),
+        f'<p align="center"><sub>{progress_summary}</sub></p>',
         "",
         "## Solutions",
+        "",
+        "<sub>Runtime and memory are reported by LeetCode; the percentage is how many submissions it beats.</sub>",
         "",
     ]
 
@@ -477,95 +551,96 @@ def main():
         if not items:
             continue
 
-        heading = difficulty if difficulty != "Unknown" else "Other"
+        heading = difficulty if difficulty != "Unknown" else "More"
+        anchor = "more" if difficulty == "Unknown" else difficulty.lower()
         noun = "problem" if len(items) == 1 else "problems"
+
         lines += [
-            f"### {heading} — {len(items)} {noun}",
+            f'<a id="{anchor}"></a>',
+            f"### {heading} <sub>· {len(items)} {noun}</sub>",
             "",
-            "| # | Problem | Lang | Time | Space | Runtime | Memory | Solution |",
-            "|---:|---|---|---|---|---|---|---|",
+            "| # | Problem | Time · Space | Runtime | Memory | Code |",
+            "|---:|---|---|---|---|---|",
         ]
 
         for problem in items:
             number = problem["number"] if problem["number"] is not None else "—"
-            title = problem["title"]
-            link = f"{LEETCODE_URL}/problems/{quote(problem['slug'])}/"
+            title = html.escape(problem["title"]).replace("|", "\\|")
+            link = f"{LEETCODE_URL}/problems/{quote(problem['slug'], safe='')}/"
 
             solutions = sorted(problem["solutions"], key=lambda p: str(p).lower())
-            for index, path in enumerate(solutions):
-                performance = problem["performance"]
+            approaches = []
+            for path in solutions:
+                approach, _, _ = complexity_for(problem["folder"].name, path.suffix)
+                if approach and approach not in approaches:
+                    approaches.append(approach)
+
+            problem_cell = f"[{title}]({link})"
+            if approaches:
+                problem_cell += (
+                    "<br><sub>"
+                    + " · ".join(format_approach(value) for value in approaches)
+                    + "</sub>"
+                )
+
+            _, time_o, space_o = complexity_for(
+                problem["folder"].name, solutions[0].suffix
+            )
+            complexity_parts = []
+            if time_o:
+                complexity_parts.append(f"`{pretty_big_o(time_o)}`")
+            if space_o:
+                complexity_parts.append(f"`{pretty_big_o(space_o)}`")
+            complexity_cell = " · ".join(complexity_parts) or "—"
+
+            performance = problem["performance"]
+            runtime_cell = format_metric(
+                performance["runtime"], performance["runtime_percentile"]
+            )
+            memory_cell = format_metric(
+                performance["memory"], performance["memory_percentile"]
+            )
+
+            code_links = []
+            for path in solutions:
                 language = EXTENSIONS[path.suffix.lower()]
                 relative_solution = quote(path.relative_to(ROOT).as_posix(), safe="/")
-                approach, time_o, space_o = complexity_for(
-                    problem["folder"].name, path.suffix
-                )
+                code_links.append(f"[`{language}`]({relative_solution})")
 
-                # Only the first row of a problem carries its number, title and
-                # approach; extra languages continue the same block.
-                if index == 0:
-                    problem_cell = (
-                        f"[{title}]({link})<br><sub>{approach}</sub>"
-                    )
-                    number_cell = number
-                else:
-                    problem_cell = f"↳ [same problem]({link})"
-                    number_cell = ""
-
-                runtime_cell = performance["runtime"]
-                if performance["runtime_percentile"]:
-                    runtime_cell += f" <sub>{performance['runtime_percentile']}</sub>"
-                memory_cell = performance["memory"]
-                if performance["memory_percentile"]:
-                    memory_cell += f" <sub>{performance['memory_percentile']}</sub>"
-
-                lines.append(
-                    f"| {number_cell} | {problem_cell} | {language} | `{time_o}` | `{space_o}` "
-                    f"| {runtime_cell} | {memory_cell} | [{language}]({relative_solution}) |"
-                )
+            lines.append(
+                f"| {number} | {problem_cell} | {complexity_cell} | {runtime_cell} "
+                f"| {memory_cell} | {' '.join(code_links)} |"
+            )
 
         lines.append("")
 
     lines += [
-        "## Repository layout",
-        "",
-        "```console",
-        *layout_tree(problem_count, example_folder, example_files),
-        "```",
-        "",
-        "<details>",
-        "<summary><b>How this index is built</b></summary>",
-        "",
-        "`.github/workflows/sync_leetcode.yml` runs on demand and does three things:",
-        "",
-        "1. syncs accepted submissions with `joshcai/leetcode-sync`;",
-        "2. runs `python scripts/generate_readme.py`;",
-        "3. commits the regenerated `README.md`.",
-        "",
-        "So this page is never edited by hand. Notes on the data it reports:",
-        "",
-        "- a folder is indexed only when it holds a `README.md` and at least one",
-        "  solution file, which keeps the index honest as the repository grows;",
-        "- difficulty comes from the public LeetCode GraphQL question metadata, and",
-        "  falls back to `Unknown` when the request fails;",
-        "- the time and memory figures are parsed from the sync commit messages, so",
-        "  a problem shows `—` until it has been submitted at least once;",
-        "- approach notes and Big-O figures are curated by hand in",
-        "  `data/problems.json` (keyed by folder and file extension) because neither",
-        "  the LeetCode API nor the synced files provide them — edit that file to",
-        "  correct a card, then rebuild.",
-        "",
-        "To rebuild locally:",
-        "",
-        "```bash",
-        "python scripts/generate_readme.py",
-        "```",
-        "",
-        "</details>",
-        "",
         "---",
         "",
         center([
-            "<sub>Automatically synchronized · Automatically indexed · Built for learning</sub>",
+            "<sub>“First, solve the problem. Then, write the code.” — John Johnson</sub>",
+            "<br /><br />",
+            " ".join([
+                img(
+                    shield(
+                        "LeetCode",
+                        LEETCODE_USERNAME,
+                        logo="leetcode",
+                        logo_color=CARBON_BLACK,
+                        color="FFFFFF",
+                    ),
+                    f"LeetCode profile: {LEETCODE_USERNAME}",
+                ),
+                img(
+                    shield(
+                        "GitHub",
+                        "leetcode-solutions",
+                        logo="github",
+                        color=GRAPHITE,
+                    ),
+                    "GitHub repository: leetcode-solutions",
+                ),
+            ]),
         ]),
         "",
     ]
