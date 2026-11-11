@@ -1,7 +1,7 @@
 <div align="center">
   <img src="assets/banner.svg" alt="LeetCode Solutions — accepted solutions in C, C++, and Java" width="100%" />
   <br /><br />
-  <img src="https://img.shields.io/badge/PROBLEMS-24-2D2D2D?style=for-the-badge&labelColor=111111&logo=leetcode&logoColor=9E9E9E" alt="Problems: 24" /> <img src="https://img.shields.io/badge/SOLUTIONS-25-2D2D2D?style=for-the-badge&labelColor=111111&logo=github&logoColor=9E9E9E" alt="Solutions: 25" /> <img src="https://img.shields.io/badge/LANGUAGES-3-2D2D2D?style=for-the-badge&labelColor=111111" alt="Languages: 3" />
+  <img src="https://img.shields.io/badge/PROBLEMS-25-2D2D2D?style=for-the-badge&labelColor=111111&logo=leetcode&logoColor=9E9E9E" alt="Problems: 25" /> <img src="https://img.shields.io/badge/SOLUTIONS-26-2D2D2D?style=for-the-badge&labelColor=111111&logo=github&logoColor=9E9E9E" alt="Solutions: 26" /> <img src="https://img.shields.io/badge/LANGUAGES-3-2D2D2D?style=for-the-badge&labelColor=111111" alt="Languages: 3" />
   <br /><br />
   <a href="#easy">Easy</a> · <a href="#medium">Medium</a> · <a href="#hard">Hard</a> · <a href="https://leetcode.com/u/paranthamank/">LeetCode profile</a>
 </div>
@@ -9,13 +9,13 @@
 ## Progress
 
 <div align="center">
-  <img src="assets/progress.svg" alt="Progress: 15 easy, 8 medium, 1 hard" width="100%" />
+  <img src="assets/progress.svg" alt="Progress: 16 easy, 8 medium, 1 hard" width="100%" />
 </div>
 
 ## Solutions
 
 <a id="easy"></a>
-### Easy <sub>· 15 problems</sub>
+### Easy <sub>· 16 problems</sub>
 
 | # | Problem | Time · Space | Runtime | Memory | Code |
 |---:|---|---|---|---|---|
@@ -28,6 +28,7 @@
 | 66 | [Plus One](https://leetcode.com/problems/plus-one/)<br><sub>handle carry · copy array</sub> | `O(n)` · `O(n)` | 0 ms <sub>100.00%</sub> | 10 MB <sub>67.92%</sub> | [`C`](0066-plus-one/solution.c) |
 | 125 | [Valid Palindrome](https://leetcode.com/problems/valid-palindrome/)<br><sub>filter alnum · two pointer compare</sub> | `O(n)` · `O(n)` | 0 ms <sub>100.00%</sub> | 9.3 MB <sub>21.39%</sub> | [`C`](0125-valid-palindrome/solution.c) |
 | 136 | [Single Number](https://leetcode.com/problems/single-number/)<br><sub>brute force · nested loops</sub> | `O(n²)` · `O(1)` | 731 ms <sub>11.74%</sub> | 10.2 MB <sub>33.58%</sub> | [`C`](0136-single-number/solution.c) |
+| 206 | [Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/) | — | 0 ms <sub>100.00%</sub> | 13.6 MB <sub>11.72%</sub> | [`C++`](0206-reverse-linked-list/solution.cpp) |
 | 344 | [Reverse String](https://leetcode.com/problems/reverse-string/) | — | 0 ms <sub>100.00%</sub> | 17.8 MB <sub>30.69%</sub> | [`C`](0344-reverse-string/solution.c) |
 | 415 | [Add Strings](https://leetcode.com/problems/add-strings/) | — | 0 ms <sub>100.00%</sub> | 9 MB <sub>92.82%</sub> | [`C++`](0415-add-strings/solution.cpp) |
 | 485 | [Max Consecutive Ones](https://leetcode.com/problems/max-consecutive-ones/)<br><sub>single pass · count streak</sub> | `O(n)` · `O(1)` | 0 ms <sub>100.00%</sub> | 13.1 MB <sub>90.02%</sub> | [`C`](0485-max-consecutive-ones/solution.c) |
