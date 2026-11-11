@@ -1,27 +1,18 @@
 <div align="center">
-  <img src="assets/banner.svg" alt="LeetCode Solutions — a growing archive of accepted solutions in C and Java" width="100%" />
+  <img src="assets/banner.svg" alt="LeetCode Solutions — accepted solutions in C and Java" width="100%" />
   <br /><br />
   <img src="https://img.shields.io/badge/PROBLEMS-20-2D2D2D?style=for-the-badge&labelColor=111111&logo=leetcode&logoColor=9E9E9E" alt="Problems: 20" /> <img src="https://img.shields.io/badge/SOLUTIONS-21-2D2D2D?style=for-the-badge&labelColor=111111&logo=github&logoColor=9E9E9E" alt="Solutions: 21" /> <img src="https://img.shields.io/badge/LANGUAGES-2-2D2D2D?style=for-the-badge&labelColor=111111" alt="Languages: 2" />
   <br /><br />
   <a href="#easy">Easy</a> · <a href="#medium">Medium</a> · <a href="#hard">Hard</a> · <a href="https://leetcode.com/u/paranthamank/">LeetCode profile</a>
 </div>
 
-## Every solution, in one place.
-
-A growing archive of accepted **LeetCode** solutions in **C** and **Java**.
-Each problem includes its original statement, clean and readable code, and the
-runtime and memory measured on LeetCode — so every approach is easy to compare.
-
 ## Progress
 
 <div align="center">
   <img src="assets/progress.svg" alt="Progress: 13 easy, 6 medium, 1 hard" width="100%" />
 </div>
-<p align="center"><sub>13 easy · 6 medium · 1 hard · 21 solutions in C and Java</sub></p>
 
 ## Solutions
-
-<sub>Runtime and memory are reported by LeetCode; the percentage is how many submissions it beats.</sub>
 
 <a id="easy"></a>
 ### Easy <sub>· 13 problems</sub>
@@ -64,7 +55,5 @@ runtime and memory measured on LeetCode — so every approach is easy to compare
 ---
 
 <div align="center">
-  <sub>“First, solve the problem. Then, write the code.” — John Johnson</sub>
-  <br /><br />
   <img src="https://img.shields.io/badge/LEETCODE-paranthamank-FFFFFF?style=for-the-badge&labelColor=111111&logo=leetcode&logoColor=111111" alt="LeetCode profile: paranthamank" /> <img src="https://img.shields.io/badge/GITHUB-leetcode--solutions-2D2D2D?style=for-the-badge&labelColor=111111&logo=github&logoColor=9E9E9E" alt="GitHub repository: leetcode-solutions" />
 </div>

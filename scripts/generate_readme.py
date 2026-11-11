@@ -22,6 +22,7 @@ from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
+BANNER = ROOT / "assets" / "banner.svg"
 PROGRESS = ROOT / "assets" / "progress.svg"
 
 REPOSITORY_URL = "https://github.com/Paranthaman-K6/leetcode-solutions"
@@ -414,6 +415,103 @@ def progress_svg(problem_count, solution_count, language_counts, difficulty_coun
 '''
 
 
+def language_phrase(language_counts):
+    names = sorted(language_counts)
+    if not names:
+        return "multiple languages"
+    if len(names) == 1:
+        return names[0]
+    if len(names) == 2:
+        return f"{names[0]} and {names[1]}"
+    return ", ".join(names[:-1]) + f", and {names[-1]}"
+
+
+def banner_svg(language_counts):
+    """The hero banner. Pills are derived from the languages actually in the repo."""
+    alt = f"LeetCode Solutions — accepted solutions in {language_phrase(language_counts)}"
+
+    pills = []
+    if language_counts:
+        gap = 12
+        labels = [
+            f"{language} · {count}"
+            for language, count in sorted(
+                language_counts.items(), key=lambda kv: (-kv[1], kv[0])
+            )
+        ]
+        widths = [max(54, round(len(label) * 8.0) + 36) for label in labels]
+        total_width = sum(widths) + gap * (len(labels) - 1)
+        x = 600 - total_width / 2
+
+        for label, width in zip(labels, widths):
+            pills.append(
+                f'    <rect x="{x:.1f}" y="184" width="{width}" height="34" rx="17" '
+                f'fill="#181818" stroke="#2d2d2d"/>\n'
+                f'    <text x="{x + width / 2:.1f}" y="206" text-anchor="middle" '
+                f'class="terminal" font-size="13" fill="#e6e6e6">'
+                f"{html.escape(label)}</text>"
+            )
+            x += width + gap
+
+    pill_group = (
+        "  <g>\n" + "\n".join(pills) + "\n  </g>" if pills else ""
+    )
+
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 270" width="1200" height="270" role="img" aria-label="{html.escape(alt, quote=True)}">
+  <title>LeetCode Solutions</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#151515"/>
+      <stop offset=".55" stop-color="#0b0b0b"/>
+      <stop offset="1" stop-color="#101010"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#9e9e9e"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2d2d2d" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#ffffff" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#2d2d2d" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="glow-white" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow-gray" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#9e9e9e" stop-opacity=".07"/>
+      <stop offset="1" stop-color="#9e9e9e" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#ffffff" opacity=".05"/>
+    </pattern>
+    <style>
+      .terminal {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }}
+      .sans {{ font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }}
+      .pulse {{ animation: pulse 6s ease-in-out infinite alternate; }}
+      @keyframes pulse {{ from {{ opacity: .55; }} to {{ opacity: 1; }} }}
+      @media (prefers-reduced-motion: reduce) {{ .pulse {{ animation: none; opacity: 1; }} }}
+    </style>
+  </defs>
+
+  <rect x="1" y="1" width="1198" height="268" rx="24" fill="url(#bg)" stroke="#2d2d2d"/>
+  <rect x="1" y="1" width="1198" height="268" rx="24" fill="url(#dots)"/>
+  <ellipse cx="600" cy="-30" rx="460" ry="190" fill="url(#glow-white)" class="pulse"/>
+  <ellipse cx="140" cy="280" rx="260" ry="140" fill="url(#glow-gray)"/>
+  <rect x="1" y="1" width="1198" height="3" rx="1.5" fill="url(#edge)"/>
+
+  <g>
+    <rect x="578" y="30" width="44" height="44" rx="13" fill="url(#brand)"/>
+    <text x="600" y="59" text-anchor="middle" class="terminal" font-size="18" font-weight="700" fill="#111111">&lt;/&gt;</text>
+  </g>
+
+  <text x="600" y="152" text-anchor="middle" class="sans" font-size="64" font-weight="800" letter-spacing="-2" fill="#ffffff">LeetCode <tspan fill="#9e9e9e">Solutions</tspan></text>
+
+{pill_group}
+</svg>
+'''
+
+
 # --------------------------------------------------------------------------- #
 
 
@@ -461,6 +559,7 @@ def main():
     difficulty_counts = Counter(problem["difficulty"] for problem in problem_list)
 
     PROGRESS.parent.mkdir(parents=True, exist_ok=True)
+    BANNER.write_text(banner_svg(language_counts), encoding="utf-8")
     PROGRESS.write_text(
         progress_svg(
             problem_count,
@@ -486,28 +585,11 @@ def main():
         f"{difficulty_counts.get('Hard', 0)} hard"
     )
 
-    language_names = sorted(language_counts)
-    if len(language_names) == 1:
-        language_phrase = language_names[0]
-    elif len(language_names) == 2:
-        language_phrase = f"{language_names[0]} and {language_names[1]}"
-    elif language_names:
-        language_phrase = ", ".join(language_names[:-1]) + f", and {language_names[-1]}"
-    else:
-        language_phrase = "multiple languages"
-
-    progress_summary = (
-        f"{difficulty_counts.get('Easy', 0)} easy · "
-        f"{difficulty_counts.get('Medium', 0)} medium · "
-        f"{difficulty_counts.get('Hard', 0)} hard · "
-        f"{solution_count} solutions in {language_phrase}"
-    )
-
     lines = [
         center([
             img(
                 BANNER_IMG,
-                "LeetCode Solutions — a growing archive of accepted solutions in C and Java",
+                f"LeetCode Solutions — accepted solutions in {language_phrase(language_counts)}",
                 width="100%",
             ),
             "<br /><br />",
@@ -529,20 +611,11 @@ def main():
             " · ".join(nav_links),
         ]),
         "",
-        "## Every solution, in one place.",
-        "",
-        "A growing archive of accepted **LeetCode** solutions in **C** and **Java**.",
-        "Each problem includes its original statement, clean and readable code, and the",
-        "runtime and memory measured on LeetCode — so every approach is easy to compare.",
-        "",
         "## Progress",
         "",
         center([img(PROGRESS_IMG, progress_alt, width="100%")]),
-        f'<p align="center"><sub>{progress_summary}</sub></p>',
         "",
         "## Solutions",
-        "",
-        "<sub>Runtime and memory are reported by LeetCode; the percentage is how many submissions it beats.</sub>",
         "",
     ]
 
@@ -618,8 +691,6 @@ def main():
         "---",
         "",
         center([
-            "<sub>“First, solve the problem. Then, write the code.” — John Johnson</sub>",
-            "<br /><br />",
             " ".join([
                 img(
                     shield(
