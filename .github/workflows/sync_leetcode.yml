@@ -30,6 +30,9 @@ jobs:
   readme:
     name: Generate README
     needs: sync
+    # Run even when the sync step trips over a stale session or a trailing
+    # empty page, so the generated README always matches the repo.
+    if: always()
     runs-on: ubuntu-latest
 
     steps:

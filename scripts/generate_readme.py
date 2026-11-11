@@ -200,6 +200,22 @@ def empty_performance():
     }
 
 
+def request_questions(payload, headers):
+    """POST one metadata batch. Returns the `data` object, or None on failure."""
+    request = urllib.request.Request(
+        "https://leetcode.com/graphql/",
+        data=payload,
+        method="POST",
+        headers=headers,
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            body = json.loads(response.read().decode("utf-8"))
+        return body.get("data") or {}
+    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError):
+        return None
+
+
 def fetch_metadata(slugs):
     session = os.environ.get("LEETCODE_SESSION", "").strip()
     csrf_token = os.environ.get("LEETCODE_CSRF_TOKEN", "").strip()
@@ -213,11 +229,13 @@ def fetch_metadata(slugs):
         "Referer": "https://leetcode.com/",
         "User-Agent": "Mozilla/5.0",
     }
+    auth_headers = dict(headers)
+    use_auth = bool(session and csrf_token)
     # Public question metadata needs no credentials; send the session when the
     # workflow provides one so the sync account's view is used.
-    if session and csrf_token:
-        headers["Cookie"] = f"csrftoken={csrf_token}; LEETCODE_SESSION={session};"
-        headers["x-csrftoken"] = csrf_token
+    if use_auth:
+        auth_headers["Cookie"] = f"csrftoken={csrf_token}; LEETCODE_SESSION={session};"
+        auth_headers["x-csrftoken"] = csrf_token
 
     results = {}
 
@@ -232,32 +250,28 @@ def fetch_metadata(slugs):
             "query": "query { " + " ".join(fields) + " }"
         }).encode("utf-8")
 
-        request = urllib.request.Request(
-            "https://leetcode.com/graphql/",
-            data=payload,
-            method="POST",
-            headers=headers,
-        )
+        data = request_questions(payload, auth_headers if use_auth else headers)
 
-        try:
-            with urllib.request.urlopen(request, timeout=20) as response:
-                body = json.loads(response.read().decode("utf-8"))
+        # An expired session makes LeetCode answer with empty data. Retry the
+        # batch anonymously so the README still gets real titles/difficulties.
+        if use_auth and not any(
+            (data or {}).get(f"q{index}") for index in range(len(chunk))
+        ):
+            data = request_questions(payload, headers)
 
-            data = body.get("data") or {}
-            for index, slug in enumerate(chunk):
-                item = data.get(f"q{index}") or {}
-                difficulty = item.get("difficulty")
-                results[slug] = {
-                    "title": html.unescape(str(item.get("title") or "")).strip(),
-                    "difficulty": (
-                        difficulty if difficulty in DIFFICULTY_ORDER else "Unknown"
-                    ),
-                }
-
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError):
+        if data is None:
             print("Warning: could not fetch LeetCode question metadata.")
-            for slug in chunk:
-                results.setdefault(slug, {"title": "", "difficulty": "Unknown"})
+            data = {}
+
+        for index, slug in enumerate(chunk):
+            item = data.get(f"q{index}") or {}
+            difficulty = item.get("difficulty")
+            results[slug] = {
+                "title": html.unescape(str(item.get("title") or "")).strip(),
+                "difficulty": (
+                    difficulty if difficulty in DIFFICULTY_ORDER else "Unknown"
+                ),
+            }
 
     return results
 
