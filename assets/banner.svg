@@ -50,9 +50,9 @@
 
   <g>
     <rect x="450.0" y="184" width="84" height="34" rx="17" fill="#181818" stroke="#2d2d2d"/>
-    <text x="492.0" y="206" text-anchor="middle" class="terminal" font-size="13" fill="#e6e6e6">C · 20</text>
+    <text x="492.0" y="206" text-anchor="middle" class="terminal" font-size="13" fill="#e6e6e6">C · 21</text>
     <rect x="546.0" y="184" width="92" height="34" rx="17" fill="#181818" stroke="#2d2d2d"/>
-    <text x="592.0" y="206" text-anchor="middle" class="terminal" font-size="13" fill="#e6e6e6">C++ · 4</text>
+    <text x="592.0" y="206" text-anchor="middle" class="terminal" font-size="13" fill="#e6e6e6">C++ · 6</text>
     <rect x="650.0" y="184" width="100" height="34" rx="17" fill="#181818" stroke="#2d2d2d"/>
     <text x="700.0" y="206" text-anchor="middle" class="terminal" font-size="13" fill="#e6e6e6">Java · 2</text>
   </g>

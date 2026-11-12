@@ -1,7 +1,7 @@
 <div align="center">
   <img src="assets/banner.svg" alt="LeetCode Solutions — accepted solutions in C, C++, and Java" width="100%" />
   <br /><br />
-  <img src="https://img.shields.io/badge/PROBLEMS-25-2D2D2D?style=for-the-badge&labelColor=111111&logo=leetcode&logoColor=9E9E9E" alt="Problems: 25" /> <img src="https://img.shields.io/badge/SOLUTIONS-26-2D2D2D?style=for-the-badge&labelColor=111111&logo=github&logoColor=9E9E9E" alt="Solutions: 26" /> <img src="https://img.shields.io/badge/LANGUAGES-3-2D2D2D?style=for-the-badge&labelColor=111111" alt="Languages: 3" />
+  <img src="https://img.shields.io/badge/PROBLEMS-28-2D2D2D?style=for-the-badge&labelColor=111111&logo=leetcode&logoColor=9E9E9E" alt="Problems: 28" /> <img src="https://img.shields.io/badge/SOLUTIONS-29-2D2D2D?style=for-the-badge&labelColor=111111&logo=github&logoColor=9E9E9E" alt="Solutions: 29" /> <img src="https://img.shields.io/badge/LANGUAGES-3-2D2D2D?style=for-the-badge&labelColor=111111" alt="Languages: 3" />
   <br /><br />
   <a href="#easy">Easy</a> · <a href="#medium">Medium</a> · <a href="#hard">Hard</a> · <a href="https://leetcode.com/u/paranthamank/">LeetCode profile</a>
 </div>
@@ -9,13 +9,13 @@
 ## Progress
 
 <div align="center">
-  <img src="assets/progress.svg" alt="Progress: 16 easy, 8 medium, 1 hard" width="100%" />
+  <img src="assets/progress.svg" alt="Progress: 19 easy, 8 medium, 1 hard" width="100%" />
 </div>
 
 ## Solutions
 
 <a id="easy"></a>
-### Easy <sub>· 16 problems</sub>
+### Easy <sub>· 19 problems</sub>
 
 | # | Problem | Time · Space | Runtime | Memory | Code |
 |---:|---|---|---|---|---|
@@ -29,9 +29,12 @@
 | 125 | [Valid Palindrome](https://leetcode.com/problems/valid-palindrome/)<br><sub>filter alnum · two pointer compare</sub> | `O(n)` · `O(n)` | 0 ms <sub>100.00%</sub> | 9.3 MB <sub>21.39%</sub> | [`C`](0125-valid-palindrome/solution.c) |
 | 136 | [Single Number](https://leetcode.com/problems/single-number/)<br><sub>brute force · nested loops</sub> | `O(n²)` · `O(1)` | 731 ms <sub>11.74%</sub> | 10.2 MB <sub>33.58%</sub> | [`C`](0136-single-number/solution.c) |
 | 206 | [Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/) | — | 0 ms <sub>100.00%</sub> | 13.6 MB <sub>11.72%</sub> | [`C++`](0206-reverse-linked-list/solution.cpp) |
+| 231 | [Power of Two](https://leetcode.com/problems/power-of-two/) | — | 0 ms <sub>100.00%</sub> | 7.7 MB <sub>74.83%</sub> | [`C++`](0231-power-of-two/solution.cpp) |
 | 344 | [Reverse String](https://leetcode.com/problems/reverse-string/) | — | 0 ms <sub>100.00%</sub> | 17.8 MB <sub>30.69%</sub> | [`C`](0344-reverse-string/solution.c) |
 | 415 | [Add Strings](https://leetcode.com/problems/add-strings/) | — | 0 ms <sub>100.00%</sub> | 9 MB <sub>92.82%</sub> | [`C++`](0415-add-strings/solution.cpp) |
 | 485 | [Max Consecutive Ones](https://leetcode.com/problems/max-consecutive-ones/)<br><sub>single pass · count streak</sub> | `O(n)` · `O(1)` | 0 ms <sub>100.00%</sub> | 13.1 MB <sub>90.02%</sub> | [`C`](0485-max-consecutive-ones/solution.c) |
+| 792 | [Binary Search](https://leetcode.com/problems/binary-search/) | — | 0 ms <sub>100.00%</sub> | 9.8 MB <sub>91.00%</sub> | [`C`](0792-binary-search/solution.c) |
+| 812 | [Rotate String](https://leetcode.com/problems/rotate-string/) | — | 0 ms <sub>100.00%</sub> | 7.9 MB <sub>78.87%</sub> | [`C++`](0812-rotate-string/solution.cpp) |
 | 1580 | [Shuffle the Array](https://leetcode.com/problems/shuffle-the-array/)<br><sub>interleave two halves in order</sub> | `O(n)` · `O(n)` | 12 ms <sub>72.80%</sub> | 12.2 MB <sub>92.26%</sub> | [`C`](1580-shuffle-the-array/solution.c) |
 | 1894 | [Merge Strings Alternately](https://leetcode.com/problems/merge-strings-alternately/)<br><sub>alternate chars · append remainder</sub> | `O(n+m)` · `O(n+m)` | 0 ms <sub>100.00%</sub> | 8.8 MB <sub>40.76%</sub> | [`C`](1894-merge-strings-alternately/solution.c) |
 | 2058 | [Concatenation of Array](https://leetcode.com/problems/concatenation-of-array/)<br><sub>duplicate array via modulo</sub> | `O(n)` · `O(n)` | 0 ms <sub>100.00%</sub> | 15.1 MB <sub>27.39%</sub> | [`C`](2058-concatenation-of-array/solution.c) |
